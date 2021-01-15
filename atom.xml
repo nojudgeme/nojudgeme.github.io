@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-01-15T04:15:27.625Z</updated>
+    <updated>2021-01-15T04:23:26.266Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -10,6 +10,15 @@
     <logo>https://nojudgeme.github.io/images/avatar.png</logo>
     <icon>https://nojudgeme.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Huffman&apos;s Study Area</rights>
+    <entry>
+        <title type="html"><![CDATA[鸟哥的私房菜-Linux(基础学习篇)]]></title>
+        <id>https://nojudgeme.github.io/post/niao-ge-de-si-fang-cai-linuxji-chu-xue-xi-pian/</id>
+        <link href="https://nojudgeme.github.io/post/niao-ge-de-si-fang-cai-linuxji-chu-xue-xi-pian/">
+        </link>
+        <updated>2021-01-15T04:21:25.000Z</updated>
+        <content type="html"><![CDATA[<p>![<iframe id="embed_dom" name="embed_dom" frameborder="0" style="display:block;width:525px; height:245px;" src="https://www.processon.com/embed/5f59820c07912902cf7ed0a2"></iframe>]</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Hello Gridea]]></title>
         <id>https://nojudgeme.github.io/post/hello-gridea/</id>
