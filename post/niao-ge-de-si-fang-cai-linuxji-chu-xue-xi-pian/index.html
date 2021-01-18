@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>鸟哥的私房菜-Linux(基础学习篇) | Huffman&#39;s Study Area</title>
-<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1610689704393">
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1610957184763">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="鸟哥的私房菜-Linux(基础学习篇) | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
@@ -23,7 +23,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://nojudgeme.github.io">
-  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1610689704393" alt="">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1610957184763" alt="">
   </a>
   <h1 class="site-title">
     Huffman&#39;s Study Area
@@ -112,6 +112,32 @@
           </div>
         
 
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
         
 
         <div class="site-footer">
