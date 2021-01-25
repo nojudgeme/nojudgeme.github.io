@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-01-18T08:12:49.192Z</updated>
+    <updated>2021-01-25T08:40:42.459Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -11,14 +11,24 @@
     <icon>https://nojudgeme.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Huffman&apos;s Study Area</rights>
     <entry>
+        <title type="html"><![CDATA[一些有趣的事情]]></title>
+        <id>https://nojudgeme.github.io/post/yi-xie-you-qu-de-shi-qing/</id>
+        <link href="https://nojudgeme.github.io/post/yi-xie-you-qu-de-shi-qing/">
+        </link>
+        <updated>2021-01-18T10:12:51.000Z</updated>
+        <content type="html"><![CDATA[<h3 id=""></h3>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[鸟哥的私房菜-Linux(基础学习篇)]]></title>
         <id>https://nojudgeme.github.io/post/niao-ge-de-si-fang-cai-linuxji-chu-xue-xi-pian/</id>
         <link href="https://nojudgeme.github.io/post/niao-ge-de-si-fang-cai-linuxji-chu-xue-xi-pian/">
         </link>
         <updated>2021-01-15T04:21:25.000Z</updated>
-        <content type="html"><![CDATA[<a href="https://www.processon.com/view/link/5faa4716e0b34d7a1aa28933" target="_blank">
-    <img src="http://assets.processon.com/chart_image/5f59820c07912902cf7ed0a6.png"/>
-</a>
+        <content type="html"><![CDATA[<p><a href="https://wizardforcel.gitbooks.io/vbird-linux-basic-4e/content/1.html">鸟哥的私房菜:基础学习篇 第四版</a><br>
+<a href="https://www.processon.com/view/link/5faa4716e0b34d7a1aa28933" target="_blank"><br>
+<img src="http://assets.processon.com/chart_image/5f59820c07912902cf7ed0a6.png"/><br>
+</a></p>
 ]]></content>
     </entry>
     <entry>
