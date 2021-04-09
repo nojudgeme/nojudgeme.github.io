@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-04-09T02:34:18.850Z</updated>
+    <updated>2021-04-09T02:37:27.114Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -330,6 +330,27 @@ public class Arrays&lt;E&gt; {
 <a href="https://www.processon.com/view/link/5faa4716e0b34d7a1aa28933" target="_blank"><br>
 <img src="http://assets.processon.com/chart_image/5f59820c07912902cf7ed0a6.png"/><br>
 </a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[关于]]></title>
+        <id>https://nojudgeme.github.io/post/about/</id>
+        <link href="https://nojudgeme.github.io/post/about/">
+        </link>
+        <updated>2019-01-25T11:09:48.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
+</blockquote>
+<h2 id="关于本站">🏠 关于本站</h2>
+<p>学习交流所见所闻,分享一切有趣的事~</p>
+<h2 id="博主是谁">👨‍💻 博主是谁</h2>
+<p>一个偶尔有技术追求的咸鱼</p>
+<h2 id="兴趣爱好">⛹ 兴趣爱好</h2>
+<p>爱动漫,打游戏,健身(还没开始orz...)</p>
+<h2 id="联系我呀">📬 联系我呀</h2>
+<p>Gmail:charles@gmail.com<br>
+QQ:2451179899<br>
+wx:q15172426627</p>
 ]]></content>
     </entry>
     <entry>
