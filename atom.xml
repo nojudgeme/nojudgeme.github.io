@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-04-09T02:37:27.114Z</updated>
+    <updated>2021-04-09T02:59:47.291Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -10,6 +10,122 @@
     <logo>https://nojudgeme.github.io/images/avatar.png</logo>
     <icon>https://nojudgeme.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Huffman&apos;s Study Area</rights>
+    <entry>
+        <title type="html"><![CDATA[从零开始学算法 - 队列]]></title>
+        <id>https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-dui-lie/</id>
+        <link href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-dui-lie/">
+        </link>
+        <updated>2021-04-09T02:42:53.000Z</updated>
+        <content type="html"><![CDATA[<pre><code class="language-java">s</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[从零开始学算法 - 栈]]></title>
+        <id>https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-zhan/</id>
+        <link href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-zhan/">
+        </link>
+        <updated>2021-04-09T02:42:03.000Z</updated>
+        <content type="html"><![CDATA[<pre><code class="language-java">/**
+ * Functional Purpose - 栈 后进先出数据结构 LIFO(Last in First Out)
+ * @date:2021-04-08 上午11:31
+ * @author huffman
+*/
+public interface Stack&lt;E&gt; {
+
+    /**
+     * 元素入栈尾
+     * @param e
+     */
+    void push(E e);
+
+    /**
+     * 元素出栈尾
+     * @return
+     */
+    E pop();
+
+    /**
+     * 获取栈尾元素
+     * @return
+     */
+    E peek();
+
+    /**
+     * 获取栈内元素总个数
+     * @return
+     */
+    int getSize();
+
+    /**
+     * 判断栈元素是否为空
+     * @return
+     */
+    boolean isEmpty();
+}
+
+/**
+ * Functional Purpose - 动态数组的方式实现栈
+ * @date:2021-04-08 上午11:54
+ * @author huffman
+*/
+public class ArrayStack&lt;E&gt; implements Stack&lt;E&gt;{
+
+    private final Arrays&lt;E&gt; arrays;
+
+    public ArrayStack() {
+        arrays = new Arrays&lt;&gt;();
+    }
+
+    public ArrayStack(int capacity){
+        arrays = new Arrays&lt;&gt;(capacity);
+    }
+
+    @Override
+    public void push(E e) {
+        arrays.addLast(e);
+    }
+
+    @Override
+    public E pop() {
+        return arrays.removeLast();
+    }
+
+    @Override
+    public E peek() {
+        return arrays.getLastElement();
+    }
+
+    @Override
+    public int getSize() {
+        return arrays.getSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return arrays.isEmpty();
+    }
+
+    public int getCapacity(){
+        return arrays.getCapacity();
+    }
+
+    @Override
+    public String toString() {
+        return &quot;ArrayStack{&quot; +
+                &quot;arrays=&quot; + arrays +
+                '}';
+    }
+
+}
+</code></pre>
+<blockquote>
+<p>注意事项:</p>
+<p>1.基于动态数组实现的栈十分简单,进行栈元素操作时,直接使用动态数组提供的添加/删除元素操作,就可以实现栈元素的操作.但需要注意的是,栈是FILO(先进后出 first in last out)或者是LIFO(后进先出 last in first out),故在添加/删除栈元素时,是入头元素和出头元素.这一点与队列相反!</p>
+<p>2.入栈操作叫:push;出栈操作叫:pop;查看栈顶元素:peek.</p>
+<p>3.无论栈的数据结构实现是什么,用户并不关心,只用知道如何操作栈元素即可(push,pop,peek).</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[从零开始学算法 - 数组]]></title>
         <id>https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-shu-zu/</id>
@@ -303,7 +419,7 @@ public class Arrays&lt;E&gt; {
 }
 </code></pre>
 <blockquote>
-<p>需要注意的重点事项:</p>
+<p>注意事项:</p>
 <p>1.在指定下标操作元素时,要注意下标是否越界</p>
 <p>2.在增加/删除元素时,要注意数组的大小,满了就扩容,少了就缩容.缩容时,要避免出现刚扩容后,立马缩容的情况,这样会增加时间复杂度,所以这里我们粗略的采用:当元素总数为容积的<strong>1/4</strong>时,进行容积的<strong>1/2</strong>缩容.</p>
 <p>3.同时,增加/删除元素时,要同时维护元素总数(size)</p>
