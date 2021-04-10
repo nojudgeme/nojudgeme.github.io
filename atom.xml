@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-04-09T02:59:47.291Z</updated>
+    <updated>2021-04-10T07:57:31.791Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -16,7 +16,264 @@
         <link href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-dui-lie/">
         </link>
         <updated>2021-04-09T02:42:53.000Z</updated>
-        <content type="html"><![CDATA[<pre><code class="language-java">s</code></pre>
+        <content type="html"><![CDATA[<pre><code class="language-java">/**
+ * Functional Purpose - 队列 先进先出数据结构 FIFO(first in first out)
+ * @date:2021-04-08 下午4:01
+ * @author huffman
+*/
+public interface Queue&lt;E&gt; {
+
+    /**
+     * 元素入队尾
+     * @param e
+     */
+    void enqueue(E e);
+
+    /**
+     * 元素出队首
+     * @return
+     */
+    E dequeue();
+
+    /**
+     * 获取队首元素
+     * @return
+     */
+    E getFront();
+
+    /**
+     * 获取队列元素总个数
+     * @return
+     */
+    int getSize();
+
+    /**
+     * 判断队列元素是否为空
+     * @return
+     */
+    boolean isEmpty();
+}
+
+/**
+ * Functional Purpose - 动态数组实现队列
+ *
+ * @author huffman
+ * @date:2021-04-08 下午4:05
+ */
+public class ArrayQueue&lt;E&gt; implements Queue&lt;E&gt; {
+
+    private Arrays&lt;E&gt; data;
+
+    public ArrayQueue() {
+        data = new Arrays();
+    }
+
+    public ArrayQueue(int capacity) {
+        data = new Arrays(capacity);
+    }
+
+    @Override
+    public void enqueue(E e) {
+        data.addLast(e);
+    }
+
+    @Override
+    public E dequeue() {
+        return data.removeFirst();
+    }
+
+    @Override
+    public E getFront() {
+        return data.getFirstElement();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return data.isEmpty();
+    }
+
+    @Override
+    public int getSize() {
+        return data.getSize();
+    }
+
+    public int getCapacity(){
+        return data.getCapacity();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder res = new StringBuilder();
+        res.append(String.format(&quot;ArrayQueue: size = %d , capacity = %d\n&quot;,getSize(),getCapacity()));
+        res.append(&quot;front:[&quot;);
+        for (int i = 0; i &lt; getSize(); i++) {
+            res.append(data.getElement(i));
+            if(i!=getSize()-1){
+                res.append(&quot; ,&quot;);
+            }
+        }
+        res.append(&quot;]tail&quot;);
+        return res.toString();
+    }
+
+    public static void main(String[] args) {
+        Queue&lt;Integer&gt; queue = new ArrayQueue&lt;&gt;();
+        for (int i = 0; i &lt; 10; i++) {
+            queue.enqueue(i);
+            System.out.println(queue);
+            if (i % 3 == 2) {
+                queue.dequeue();
+                System.out.println(queue);
+            }
+        }
+    }
+}
+
+/**
+ * Functional Purpose -  循环队列
+ * 以牺牲一个空间,头部和尾部索引循环,得到循环队列
+ * 当头部等于尾部时,认为该队列为空;当头部等于(尾部+1)/总容量时,认为该队列已满
+ *
+ * @author huffman
+ * @date:2021-04-08 下午4:55
+ */
+public class LoopQueue&lt;E&gt; implements Queue&lt;E&gt; {
+
+    /**
+     * 数组存储元素
+     */
+    private E[] data;
+
+    /**
+     * 下标的头部,尾部
+     */
+    private int front, tail;
+
+    /**
+     * 元素总个数
+     */
+    private int size;
+
+    /**
+     * 扩容因子
+     */
+    private int resizeFactor = 2;
+
+    public LoopQueue(int capacity) {
+        data = (E[]) new Object[capacity + 1];
+        front = 0;
+        tail = 0;
+        size = 0;
+    }
+
+    public LoopQueue() {
+        this(10);
+    }
+
+    @Override
+    public void enqueue(E e) {
+        //先看容量大小,需不需要扩容
+        if ((tail + 1) % data.length == front) {
+            resize(resizeFactor * getCapacity());
+        }
+        //维护队尾下标和元素总数
+        data[tail] = e;
+        tail = (tail + 1) % data.length;
+        size++;
+    }
+
+    @Override
+    public E dequeue() {
+        //如果容器中无元素,则直接抛出异常
+        if (isEmpty()) {
+            throw new IllegalArgumentException(&quot;The queue is empty,no element can be dequeue&quot;);
+        }
+        //维护队首下标和元素总数
+        E e = data[front];
+        data[front] = null;
+        front = (front + 1) % data.length;
+        size--;
+        //看容量大小,需不需要扩容,这里也采用懒缩容的方式,避免复杂度震荡,增加复杂度
+        if (size == getCapacity() / resizeFactor / 2) {
+            resize(getCapacity() / resizeFactor);
+        }
+        return e;
+    }
+
+    @Override
+    public E getFront() {
+        if (isEmpty()) {
+            throw new IllegalArgumentException(&quot;The queue is empty.&quot;);
+        }
+        return data[front];
+    }
+
+    @Override
+    public int getSize() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return front == tail;
+    }
+
+    public int getCapacity() {
+        return data.length - 1;
+    }
+
+    private void resize(int newCapacity) {
+        E[] newData = (E[]) new Object[newCapacity + 1];
+        //挪动元素
+        for (int i = 0; i &lt; size; i++) {
+            newData[i] = data[(front + i) % data.length];
+        }
+        data = newData;
+        front = 0;//头下标 从0开始
+        tail = size;//尾下标 从最后的元素开始
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder res = new StringBuilder();
+        res.append(String.format(&quot;LoopQueue: size = %d , capacity = %d\n&quot;, getSize(), getCapacity()));
+        res.append(String.format(&quot;front [&quot;));
+        for (int i = front; i != tail; i = (i + 1) % data.length) {
+            res.append(data[i]);
+            if ((i + 1) % data.length != tail) {
+                res.append(&quot;, &quot;);
+            }
+        }
+        res.append(String.format(&quot;] tail&quot;));
+        return res.toString();
+    }
+
+    public static void main(String[] args) {
+        Queue&lt;Integer&gt; queue = new LoopQueue&lt;&gt;();
+        for (int i = 0; i &lt; 10; i++) {
+            queue.enqueue(i);
+            System.out.println(queue);
+            if (i % 3 == 2) {
+                queue.dequeue();
+                System.out.println(queue);
+            }
+        }
+    }
+}
+</code></pre>
+<blockquote>
+<p>注意事项:</p>
+<p>1.同样的,无论队列的数据结构实现是什么,用户并不关心,只用知道如何操作队列元素即可(入队:enqueue;出队:dequeue;查看队首元素:front).</p>
+<p>2.此处队列提供了两种实现方式:以动态数组的方式实现与以循环数组的方式实现.</p>
+<p>优缺点比较:</p>
+<p>动态数组优点:直接采用动态数组为底层数据结构,直接复用Arrays代码,通过Arrays的增加/删除元素操作队列进行入队/出队操作.实现起来十分简单.</p>
+<p>动态数组缺点:进行出队操作时,需要将头元素以后的元素往前挪一位,时间复杂度表现为O(n),性能较差.</p>
+<p>循环数组优点:进行出队操作时,只需维护Front头元素的下标信息,指向下一个下标即可,时间复杂度表现为O(1),性能优秀.</p>
+<p>循环数组缺点:需要实现新的数据结构-循环数组,在进行出队/入队操作时,需要维护front/tail信息,增加了理解难度.</p>
+<p>3.循环数组的实现逻辑:可以想象一个时钟,刻度为12(capacity),头元素为0,尾元素最大值为11(capacity-1),当尾元素到达12时,也同时指向0. 可以理解为该时钟又从零开始 : 即 当头元素=尾元素时,该数组为空;当尾元素=11(capacity-1)时,最大,同时该数组应该扩容. 注意:capacity+1 = length!</p>
+<p>4.循环数组牺牲了一个空间,为了保证该数组容积大小等于初始化时的容积大小,故在初始化时需要将指定容积大小+1,所以当获取该容积时,需要将数组长度-1时,才能符合用户预期输入时的容积大小.进行循环时,实际还是得除以数组的实际容积大小,才能保证循环.</p>
+<p>5.循环操作:front = (front+1)/length;tail = (tail+1)/length.  只有除以了length,才能保证front、tail永远小于length,故在一个数组长度内进行循环</p>
+</blockquote>
 ]]></content>
     </entry>
     <entry>
@@ -120,9 +377,8 @@ public class ArrayStack&lt;E&gt; implements Stack&lt;E&gt;{
 </code></pre>
 <blockquote>
 <p>注意事项:</p>
-<p>1.基于动态数组实现的栈十分简单,进行栈元素操作时,直接使用动态数组提供的添加/删除元素操作,就可以实现栈元素的操作.但需要注意的是,栈是FILO(先进后出 first in last out)或者是LIFO(后进先出 last in first out),故在添加/删除栈元素时,是入头元素和出头元素.这一点与队列相反!</p>
-<p>2.入栈操作叫:push;出栈操作叫:pop;查看栈顶元素:peek.</p>
-<p>3.无论栈的数据结构实现是什么,用户并不关心,只用知道如何操作栈元素即可(push,pop,peek).</p>
+<p>1.无论栈的数据结构实现是什么,用户并不关心,只用知道如何操作栈元素即可(入栈:push,出栈:pop,查看栈顶元素:peek).</p>
+<p>2.基于动态数组实现的栈十分简单,进行栈元素操作时,直接使用动态数组提供的添加/删除元素操作,就可以实现栈元素的操作.但需要注意的是,栈是FILO(先进后出 first in last out)或者是LIFO(后进先出 last in first out),故在添加/删除栈元素时,是入头元素和出头元素.这一点与队列相反!</p>
 </blockquote>
 ]]></content>
     </entry>
@@ -344,8 +600,8 @@ public class Arrays&lt;E&gt; {
     public E remove(int index) {
         checkIndex(index);
         E e = data[index];
-        for (int i = index; i &lt; size; i++) {
-            data[i] = data[i + 1];
+        for (int i = index+1; i &lt; size; i++) {
+            data[i-1] = data[i];
         }
         size--;
 
