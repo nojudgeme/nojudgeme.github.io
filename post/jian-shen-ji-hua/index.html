@@ -2,22 +2,20 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>从零开始学算法 - 栈 | Huffman&#39;s Study Area</title>
+<title>健身计划 | Huffman&#39;s Study Area</title>
 <link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620380033176">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="从零开始学算法 - 栈 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="健身计划 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="/**
- * Functional Purpose - 栈 后进先出数据结构 LIFO(Last in First Out)
- * @date:2021-04-08 上午11:31
- * @author huffman
-*/
-public ..." />
-    <meta name="keywords" content="数据结构与算法" />
+    <meta name="description" content="
+    ![](https://nojudgeme.github.io/post-images/1620380030044.png)
+
+..." />
+    <meta name="keywords" content="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -79,122 +77,23 @@ public ..." />
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              从零开始学算法 - 栈
+              健身计划
             </h2>
             <div class="post-info">
               <span>
-                2021-04-09
+                2021-05-07
               </span>
               <span>
-                2 min read
+                1 min read
               </span>
-              
-                <a href="https://nojudgeme.github.io/tag/3wOUpFScd/" class="post-tag">
-                  # 数据结构与算法
-                </a>
               
             </div>
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <pre><code class="language-java">/**
- * Functional Purpose - 栈 后进先出数据结构 LIFO(Last in First Out)
- * @date:2021-04-08 上午11:31
- * @author huffman
-*/
-public interface Stack&lt;E&gt; {
-
-    /**
-     * 元素入栈尾
-     * @param e
-     */
-    void push(E e);
-
-    /**
-     * 元素出栈尾
-     * @return
-     */
-    E pop();
-
-    /**
-     * 获取栈尾元素
-     * @return
-     */
-    E peek();
-
-    /**
-     * 获取栈内元素总个数
-     * @return
-     */
-    int getSize();
-
-    /**
-     * 判断栈元素是否为空
-     * @return
-     */
-    boolean isEmpty();
-}
-
-/**
- * Functional Purpose - 动态数组的方式实现栈
- * @date:2021-04-08 上午11:54
- * @author huffman
-*/
-public class ArrayStack&lt;E&gt; implements Stack&lt;E&gt;{
-
-    private final Arrays&lt;E&gt; arrays;
-
-    public ArrayStack() {
-        arrays = new Arrays&lt;&gt;();
-    }
-
-    public ArrayStack(int capacity){
-        arrays = new Arrays&lt;&gt;(capacity);
-    }
-
-    @Override
-    public void push(E e) {
-        arrays.addLast(e);
-    }
-
-    @Override
-    public E pop() {
-        return arrays.removeLast();
-    }
-
-    @Override
-    public E peek() {
-        return arrays.getLastElement();
-    }
-
-    @Override
-    public int getSize() {
-        return arrays.getSize();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return arrays.isEmpty();
-    }
-
-    public int getCapacity(){
-        return arrays.getCapacity();
-    }
-
-    @Override
-    public String toString() {
-        return &quot;ArrayStack{&quot; +
-                &quot;arrays=&quot; + arrays +
-                '}';
-    }
-
-}
-</code></pre>
-<blockquote>
-<p>注意事项:</p>
-<p>1.无论栈的数据结构实现是什么,用户并不关心,只用知道如何操作栈元素即可(入栈:push,出栈:pop,查看栈顶元素:peek).</p>
-<p>2.基于动态数组实现的栈十分简单,进行栈元素操作时,直接使用动态数组提供的添加/删除元素操作,就可以实现栈元素的操作.但需要注意的是,栈是FILO(先进后出 first in last out)或者是LIFO(后进先出 last in first out),故在添加/删除栈元素时,是入头元素和出头元素.这一点与队列相反!</p>
-</blockquote>
+                <a href="https://www.notion.so/94664b0154524bba9d9eee6540497593" target="_blank">
+    ![](https://nojudgeme.github.io/post-images/1620380030044.png)
+</a>
 
               </div>
               <div class="toc-container">
@@ -207,9 +106,9 @@ public class ArrayStack&lt;E&gt; implements Stack&lt;E&gt;{
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-shu-zu/">
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-zhu-jie/">
               <h3 class="post-title">
-                从零开始学算法 - 数组
+                Java基础篇 - 注解
               </h3>
             </a>
           </div>
