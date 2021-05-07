@@ -1,0 +1,470 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 注解 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620378398601">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 注解 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="1.注解是什么
+注释: 说明文字,给人看的.
+注解: 修饰数据的元数据,给JVM看的.
+元注解: 修饰注解的注解.
+2.为什么要使用注解
+当我们希望描述一种数据时,使它能有更多的内容(如修饰词一样).
+3.如何使用注解
+在使用注解之前,先了..." />
+    <meta name="keywords" content="java,注解" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1620378398601" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 注解
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-05-07
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/sbEDEJBPeU/" class="post-tag">
+                  # 注解
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="1注解是什么">1.注解是什么</h4>
+<p>注释: 说明文字,给人看的.</p>
+<p>注解: 修饰数据的元数据,给JVM看的.</p>
+<p>元注解: 修饰注解的注解.</p>
+<h4 id="2为什么要使用注解">2.为什么要使用注解</h4>
+<p>当我们希望描述一种数据时,使它能有更多的内容(如修饰词一样).</p>
+<h4 id="3如何使用注解">3.如何使用注解</h4>
+<p>在使用注解之前,先了解一下几个常见注解.</p>
+<h5 id="基本注解javalang包下">基本注解(java.lang包下)</h5>
+<p>3.1 @Deprecated</p>
+<blockquote>
+<p>注释为@Deprecated的程序元素是不鼓励程序员使用的元素。 某个元素可能由于多种原因而被弃用，例如，其使用可能会导致错误； 可能无法兼容地进行更改，或者在将来的版本中将其删除； 它已被更新的，通常更可取的替代方法所取代； 否则它已经过时了。     								  -</p>
+<p>​		--来源java.lang.Deprecated注释描述</p>
+</blockquote>
+<p>简而言之:Deprecated注解用于<strong>标记程序为过时的</strong>.</p>
+<p>@FunctionalInterface</p>
+<blockquote>
+<p>信息性注释类型，用于指示接口类型声明旨在成为Java语言规范定义的功能接口。 从概念上讲，功能接口仅具有一种抽象方法。 由于默认方法具有实现，因此它们不是抽象的。 如果接口声明了一个覆盖java.lang.Object的公共方法之一的抽象方法，则该方法也不计入接口的抽象方法计数，因为该接口的任何实现都将具有java.lang.Object或其他地方的实现。</p>
+<p>​		---来源java.lang.FunctionalInterface注释描述</p>
+</blockquote>
+<p>简而言之:FunctionalInterface注解用于<strong>标记接口为函数式接口</strong>.</p>
+<p>3.3 @Override</p>
+<blockquote>
+<p>指示方法声明旨在覆盖超类型中的方法声明。 如果使用此注释类型对方法进行注释，则除非至少满足以下条件之一，否则要求编译器生成错误消息：<br>
+该方法的确覆盖或实现了在超类型中声明的方法。<br>
+该方法的签名与Object中声明的任何公共方法的签名等效。</p>
+<p>​		---来源java.lang.Override注释描述</p>
+</blockquote>
+<p>简而言之:Override注解用于<strong>重写父类的方法</strong>.</p>
+<p>3.4 @SafeVarargs</p>
+<blockquote>
+<p>程序员断言带注释的方法或构造函数的主体不会对其varargs参数执行潜在的不安全操作。 将此注释应用于方法或构造函数可抑制有关非可调整变量Arity （vararg）类型的未经检查的警告，并抑制有关在调用站点创建参数化数组的未经检查的警告。<br>
+除了其@Target元注释所施加的使用限制外，还要求编译器对此注释类型实施附加的使用限制。 如果用@SafeVarargs批注对方法或构造函数声明进行批注，则编译时错误，并且：<br>
+声明是固定的arity方法或构造函数<br>
+声明是可变的arity方法，既非static也非final或private 。</p>
+<p>@SafeVarargs // Not actually safe!<br>
+static void m(List<String>... stringLists) {<br>
+Object[] array = stringLists;<br>
+List<Integer> tmpList = Arrays.asList(42);<br>
+array[0] = tmpList; // Semantically invalid, but compiles without warnings<br>
+String s = stringLists[0].get(0); // Oh no, ClassCastException at runtime!<br>
+}</p>
+<p>​		---来源java.lang.SafeVarargs注释描述</p>
+</blockquote>
+<p>简而言之:SafeVarargs注解用于<strong>当一个非泛型集合(如Object[])赋值给泛型集合时,发生堆污染</strong>.</p>
+<p>3.5 @SuppressWarnings</p>
+<blockquote>
+<p>指示应在带注释的元素（以及带注释的元素中包含的所有程序元素）中禁止命名的编译器警告。 请注意，在给定元素中禁止显示的警告集是在所有包含元素中禁止显示的警告的超集。 例如，如果您注释一个类以禁止一个警告，并注释一个方法以禁止另一个警告，则两种警告将在该方法中被抑制。 但是，请注意，如果在module-info文件中禁止显示警告，则该禁止适用于文件中的元素，而不适用于模块中包含的类型。<br>
+作为样式问题，程序员应始终在最有效嵌套的最深层元素上使用此注释。 如果要在特定方法中禁止显示警告，则应注释该方法而不是其类。</p>
+<p>​		---来源java.lang.SuppressWarnings注释描述</p>
+</blockquote>
+<p>简而言之:SuppressWarnings用于<strong>抑制编译器警告</strong>.</p>
+<h5 id="元注解javalangannotation包下">元注解(java.lang.annotation包下)</h5>
+<p>3.6 @Documented</p>
+<blockquote>
+<p>如果注释@Documented出现在注释类型A的声明中，则元素上的任何@A注释@A视为元素公共合同的一部分。 更详细地，当注释类型A与注释Documented ，存在和类型A的注释的值是元素A注释的公共合同的一部分。 相反，如果注释类型B没有带注释Documented ，存在和B的注释的值都不是元件B注释的公共合同的一部分。 具体来说，如果注释类型用Documented注释，则默认情况下，像javadoc这样的工具将在其输出中显示该类型的注释，而没有Documented的注释类型的注释将不显示。</p>
+<p>​		---来源java.lang.annotation.Documented注释描述</p>
+</blockquote>
+<p>简而言之:Documented用于<strong>被@Documented修饰的注解会被javadoc工具输出成文档</strong>.</p>
+<p>3.7 @Inherited</p>
+<blockquote>
+<p>指示注释类型是自动继承的。 如果注释类型声明中存在继承的元注释，并且用户在类声明中查询该注释类型，并且该类声明中没有该类型的注释，则将自动查询该类的超类以获取注释类型。 重复此过程，直到找到该类型的注释或到达类层次结构（对象）的顶部为止。 如果没有超类对此类型进行注释，则查询将指示所讨论的类没有此类注释。<br>
+请注意，如果带注释的类型用于注释除类之外的任何内容，则此元注释类型无效。 还要注意，此元注释仅使注释从超类继承； 已实现的接口上的注释无效。</p>
+<p>​		---来源java.lang.annotation.Inherited注释描述</p>
+</blockquote>
+<p>简而言之:Inherited用于<strong>被修饰的注解将会被子类继承</strong>.</p>
+<p>3.8 @Repeatable</p>
+<blockquote>
+<p>注释类型java.lang.annotation.Repeatable用于指示其声明（元（meta-））注释的注释类型可重复。 @Repeatable的值表示可重复注释类型的包含注释类型。</p>
+<p>​		---来源java.lang.annotation.Repeatable注释描述</p>
+</blockquote>
+<p>简而言之：Repeatable用于<strong>被修饰的注解可以重复使用</strong>.</p>
+<p>3.9 @Retention</p>
+<blockquote>
+<p>指示带注释类型的注释将保留多长时间。 如果注释类型声明上没有保留注释，则保留策略默认为RetentionPolicy.CLASS 。<br>
+仅当元注释类型直接用于注释时，保留元注释才有效。 如果将元注释类型用作另一注释类型的成员类型，则无效。</p>
+<p>​		---来源java.lang.annotation.Retention注释描述</p>
+</blockquote>
+<p>简而言之：Retention用于<strong>决定被修饰的注解的生命周期</strong>.</p>
+<p>3.10 @Target</p>
+<blockquote>
+<p>指示注释类型适用的上下文。 在JLS 9.6.4.1中指定了可以在其中应用注释类型的声明上下文和类型上下文，并在源代码中用java.lang.annotation.ElementType的枚举常量表示。<br>
+如果在注释类型T上不存在@Target元注释，则可以将类型T的注释写为除类型参数声明之外的任何声明的修饰符。<br>
+如果存在@Target元注释，则编译器将强制执行ElementType枚举常量指示的使用限制，以符合JLS 9.7.4的要求。</p>
+<p>​		---来源java.lang.annotation.Target注释描述</p>
+</blockquote>
+<p>简而言之：Target用于<strong>指定被修饰的注解用在可以修饰的地方</strong>.</p>
+<h5 id="补充说明">补充说明</h5>
+<p>上述说到，Retention用于<strong>决定被修饰的注解的生命周期</strong>.其中RetentionPolicy定义了三个生命阶段</p>
+<pre><code class="language-java">public enum RetentionPolicy {
+    /**
+     * Annotations are to be discarded by the compiler.
+     */
+    SOURCE,
+
+    /**
+     * Annotations are to be recorded in the class file by the compiler
+     * but need not be retained by the VM at run time.  This is the default
+     * behavior.
+     */
+    CLASS,
+
+    /**
+     * Annotations are to be recorded in the class file by the compiler and
+     * retained by the VM at run time, so they may be read reflectively.
+     *
+     * @see java.lang.reflect.AnnotatedElement
+     */
+    RUNTIME
+}
+</code></pre>
+<p>RetentionPolicy.SOURCE：注解被编译器使用，只存在于.java文件，不会进入到.class文件，被编译后(javac)成.class文件后擦除。</p>
+<p>RetentionPolicy.CLASS：注解被.class文件使用，不会进入到JRE(Java Runtime Environment)中。</p>
+<p>RetentionPolicy.RUNTIME：注解会在程序运行时读取到，一直存在于JVM中，也是我们最常用以及自定义注解时需要指明的注解生命周期。</p>
+<p>Java文件的编译流程：</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/dyo3u7g3go.png" alt="dyo3u7g3go" loading="lazy"></figure>
+<p>其中source-&gt;compiler过程：</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/321arjo9gz.png" alt="321arjo9gz" loading="lazy"></figure>
+<p>整个编译-&gt;执行过程：source(java源代码)-&gt;parse(分析和输入到符号表)-&gt;processor(注解处理器)-&gt;analyse(分析语义)-&gt;generate(生成文件)-&gt;javac(编译)-&gt;字节码-&gt;classload(类加载)-&gt;JIT-&gt;机器码-&gt;目标机器执行</p>
+<p>如果想在RetentionPolicy.class周期时获取到注解信息，需要继承AbstractProcessor类，实现process功能.(Lombok 生成get/set方法实现方式)</p>
+<h5 id="自定义注解">自定义注解</h5>
+<p>元注解：</p>
+<pre><code class="language-java">/**
+ * 元注解:修饰注解的注解
+ * 即Target为ElementType.ANNOTATION_TYPE
+ * 对注解进行标记,说明
+ * JDK提供的元注解在java.lang.annotation包下,一共有5个      			(Documented,Inherited,Repeatable,Retention,Target)
+ * 其中Native注解较为特殊,使用@Target(ElementType.FIELD)
+ * 另外:所有注解都隐式继承java.lang.annotation.Annotation接口
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface MetaAnnotation {
+}
+</code></pre>
+<p>普通注解：</p>
+<pre><code class="language-java">/**
+ * 注解:修饰数据的元数据
+ * 即Target为除了(ElementType.ANNOTATION_TYPE)之外的ElementType
+ * 对数据进行标记,说明
+ * JDK提供的注解在java.lang包下
+ */
+@Retention(RetentionPolicy.RUNTIME) //Retention注解决定了该注解的生命周期,默认值RetentionPolicy.CLASS,详见Retention.class注释
+@Target({ElementType.CONSTRUCTOR,ElementType.PARAMETER}) //target注解决定了该注解的使用范围
+@MetaAnnotation
+public @interface MyAnnotation {
+
+    /**
+     * 注解不能使用除(String,基本数据类型,Class,枚举,数组,注解)以外的数据类型
+     */
+
+    String name();
+
+    int age() default 18; //default指定了缺省值
+
+    //Class clazz();
+    //ElementType TYPE();
+    //int[] numbs();
+    //Retention RETENTION();
+    //Integer age();  无法通过编译
+}
+</code></pre>
+<p>特殊注解：</p>
+<pre><code class="language-java">/**
+ * 当注解只有一个成员变量,且属性名为value时,赋值时不用显示声明value=XX
+ */
+@Retention(RetentionPolicy.RUNTIME)
+public @interface MyAnnotation2 {
+
+    String value();
+}
+</code></pre>
+<h5 id="使用注解">使用注解</h5>
+<pre><code class="language-java">public class Human {
+
+    private String name;
+
+    private int age;
+
+    @MyAnnotation(name = &quot;jarvis&quot;)
+    public Human() {
+        for (Constructor&lt;?&gt; constructor : Human.class.getConstructors()) {
+            if (constructor.isAnnotationPresent(MyAnnotation.class)) {
+                MyAnnotation annotation = constructor.getAnnotation(MyAnnotation.class);
+                this.name = annotation.name();
+                this.age = annotation.age();
+            }
+        }
+    }
+
+    public Human(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public Human resetHuman(@MyAnnotation(name = &quot;huffman&quot;, age = 22) Human human) throws NoSuchMethodException {
+        Method resetHuman = Human.class.getMethod(&quot;resetHuman&quot;, Human.class);
+        for (Annotation[] parameterAnnotation : resetHuman.getParameterAnnotations()) {
+            for (Annotation annotation : parameterAnnotation) {
+                if (annotation instanceof MyAnnotation) {
+                    MyAnnotation myAnnotation = (MyAnnotation) annotation;
+                    String name = myAnnotation.name();
+                    int age = myAnnotation.age();
+                    return new Human(name, age);
+                }
+            }
+        }
+        return null;
+    }
+
+    @MyAnnotation2(&quot;test&quot;)
+    public String getValue() throws NoSuchMethodException {
+        Method getValue = Human.class.getMethod(&quot;getValue&quot;);
+        return getValue.getAnnotation(MyAnnotation2.class).value();
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Human{&quot; +
+                &quot;name='&quot; + name + '\'' +
+                &quot;, age=&quot; + age +
+                '}';
+    }
+
+    public static void main(String[] args) throws NoSuchMethodException {
+        Human human = new Human();
+        //System.out.println(human); 输出Human{name='jarvis', age=18}
+        human = human.resetHuman(human);
+        //System.out.println(human); 输出Human{name='huffman', age=22}
+        //System.out.println(human.getValue()); 输出test
+    }
+}
+</code></pre>
+<h4 id="4总结">4.总结</h4>
+<p>1.注解是用于修饰数据的一种特殊标记，注解本身对代码逻辑没有任何影响，如何使用注解完全由工具决定。</p>
+<p>2.当我们需要给程序添加标注时，可以使用注解。</p>
+<p>3.java.lang包提供了基础注解和元注解，元注解用于修饰注解。</p>
+<p>4.注解有三个生命周期：源码时(source)，Class文件时(class)，运行时(Runtime)。我们常常自定义注解需要在运行时通过反射获取，通过程序对获取到的注解实现相应功能。</p>
+<p>5.如果想利用java文件在编译过程中，利用注解实现功能，可以考虑通过继承AbstractProcessor类，实现process功能来完成。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1%E6%B3%A8%E8%A7%A3%E6%98%AF%E4%BB%80%E4%B9%88">1.注解是什么</a></li>
+<li><a href="#2%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E6%B3%A8%E8%A7%A3">2.为什么要使用注解</a></li>
+<li><a href="#3%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E6%B3%A8%E8%A7%A3">3.如何使用注解</a>
+<ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%B3%A8%E8%A7%A3javalang%E5%8C%85%E4%B8%8B">基本注解(java.lang包下)</a></li>
+<li><a href="#%E5%85%83%E6%B3%A8%E8%A7%A3javalangannotation%E5%8C%85%E4%B8%8B">元注解(java.lang.annotation包下)</a></li>
+<li><a href="#%E8%A1%A5%E5%85%85%E8%AF%B4%E6%98%8E">补充说明</a></li>
+<li><a href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3">自定义注解</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E6%B3%A8%E8%A7%A3">使用注解</a></li>
+</ul>
+</li>
+<li><a href="#4%E6%80%BB%E7%BB%93">4.总结</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-dui-lie/">
+              <h3 class="post-title">
+                从零开始学算法 - 队列
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
