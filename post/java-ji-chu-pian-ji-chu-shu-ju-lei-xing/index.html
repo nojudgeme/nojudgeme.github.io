@@ -1,0 +1,387 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 基础数据类型 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620469558553">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 基础数据类型 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="基础数据类型
+Java中定义的八大基础数据类型:
+
+
+
+基础数据类型
+包装类
+
+
+
+
+boolean
+Boolean
+
+
+char
+Character
+
+
+byte
+Byte
+
+
+short
+Short
+
+
+int
+Integer
+
+
+lo..." />
+    <meta name="keywords" content="基本数据类型,java" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1620469558553" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 基础数据类型
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-05-08
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/BbqrF78Jr/" class="post-tag">
+                  # 基本数据类型
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h5 id="基础数据类型">基础数据类型</h5>
+<p>Java中定义的八大基础数据类型:</p>
+<table>
+<thead>
+<tr>
+<th>基础数据类型</th>
+<th>包装类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td>char</td>
+<td>Character</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>Byte</td>
+</tr>
+<tr>
+<td>short</td>
+<td>Short</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>float</td>
+<td>Float</td>
+</tr>
+<tr>
+<td>double</td>
+<td>Double</td>
+</tr>
+</tbody>
+</table>
+<p>要了解各个基础数据类型的区别，需要简单了解计算机存储单元。</p>
+<h5 id="计算机存储单元">计算机存储单元</h5>
+<p>计算机系统数据只用0和1这种表现形式，一个0或者1占一个“位”，而系统中规定8个位为一个字节。电脑的各种存储器的最小的存储单位是比特，也就是位（bit，简称b），它表示一个二进制位。比位大的单位是字节（byte，简称B），它等于8个二进制位：1byte=8bit。它的二进制表示范围从<code>00000000</code><sub>`11111111`，换算成十进制是`0`</sub><code>255</code>，换算成十六进制是<code>00</code>~<code>ff</code>。</p>
+<p>因为在存储器中含有大量的存储单元，每个存储单元可以存放8个二进制位，所以存储器的容量是以字节为基本单位的。</p>
+<p>每个英文字母要占<strong>一个字节(1byte)</strong>，一个汉字要占<strong>两个字节(2byte)</strong>。</p>
+<p>其它常用的单位还有千字节（Kilobyte，简称K或者KB，1KB等于1024B）、兆字节（Megabyte，简称M或者MB，1MB等于1024KB）和吉字节（Gigabyte，简称G或者GB，1GB等于1024MB）。<code>B = byte</code></p>
+<h5 id="基本数据类型占用的字节数">基本数据类型占用的字节数</h5>
+<p>了解完计算机存储单元的最小存储单位是比特后，下面可以看一下基础数据类型对应的字节数和比特位。</p>
+<pre><code class="language-ascii">       ┌───┐
+  byte │   │								1byte = 8bit
+       └───┘
+       ┌───┬───┐
+ short │   │   │							2byte = 16bit
+       └───┴───┘
+       ┌───┬───┬───┬───┐
+   int │   │   │   │   │					4byte = 32bit
+       └───┴───┴───┴───┘
+       ┌───┬───┬───┬───┬───┬───┬───┬───┐
+  long │   │   │   │   │   │   │   │   │	8byte = 64bit
+       └───┴───┴───┴───┴───┴───┴───┴───┘
+       ┌───┬───┬───┬───┐
+ float │   │   │   │   │					4byte = 32bit
+       └───┴───┴───┴───┘
+       ┌───┬───┬───┬───┬───┬───┬───┬───┐
+double │   │   │   │   │   │   │   │   │	8byte = 64bit
+       └───┴───┴───┴───┴───┴───┴───┴───┘
+       ┌───┬───┐
+  char │   │   │							2byte = 16bit
+       └───┴───┘
+</code></pre>
+<h5 id="基本数据类型最大值最小值计算">基本数据类型最大值/最小值计算</h5>
+<p>让我们以int类型为例，通过以位运算(二进制)的方式计算出int的最大值/最小值。我们规定最高位是符号位，0为正，1为负。</p>
+<pre><code class="language-ascii">          		  0   1   2   3   4   5   6  ... 32
+        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
+ int初始值:      │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│	0 │
+        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+</code></pre>
+<p>当我们从最低位(32位)开始增加时，逢2进1</p>
+<pre><code class="language-ascii">          		  0   1   2   3   4   5   6  ... 32
+        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
+ int初始值:      │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 1 │...│	0 │
+        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+</code></pre>
+<p>​																					……</p>
+<p>一直增加至首位(1)为1时，最高位(0位) 为0时，int数最大</p>
+<pre><code class="language-ascii">          		  0   1   2   3   4   5   6  ... 32
+        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
+ int最大值:      │ 0 │ 1 │ 1 │ 1 │ 1 │ 1 │ 1 │...│	1 │
+        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+</code></pre>
+<p>至此，运算次数达到了<code>int.max = 2^31-1</code>次</p>
+<p>如果此时，再进一位<code>int.max+1</code>,就变成如下情况</p>
+<pre><code class="language-ascii">          		  0   1   2   3   4   5   6  ... 32
+        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
+ int最小值:      │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│	0 │
+        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+</code></pre>
+<p>变成了<code>int.min =-2^31</code></p>
+<h5 id="jdk中基础数据类型的最大值最小值比特位">JDK中基础数据类型的最大值/最小值,比特位</h5>
+<p>查看基础数据类型的最大值/最小值，比特位，可以通过JDK提供的包装类：MAX_VALUE、MIN_VALUE、SIZE属性查看。</p>
+<p>以int类型为例：</p>
+<pre><code class="language-java">public final class Integer extends Number implements Comparable&lt;Integer&gt; {
+    /**
+     * A constant holding the minimum value an {@code int} can
+     * have, -2&lt;sup&gt;31&lt;/sup&gt;.
+     */
+    @Native public static final int   MIN_VALUE = 0x80000000;
+
+    /**
+     * A constant holding the maximum value an {@code int} can
+     * have, 2&lt;sup&gt;31&lt;/sup&gt;-1.
+     */
+    @Native public static final int   MAX_VALUE = 0x7fffffff;
+    
+    /**
+     * The number of bits used to represent an {@code int} value in two's
+     * complement binary form.
+     *
+     * @since 1.5
+     */
+    @Native public static final int SIZE = 32;
+
+    /**
+     * The number of bytes used to represent an {@code int} value in two's
+     * complement binary form.
+     *
+     * @since 1.8
+     */
+    public static final int BYTES = SIZE / Byte.SIZE;
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B">基础数据类型</a></li>
+<li><a href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%98%E5%82%A8%E5%8D%95%E5%85%83">计算机存储单元</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%8D%A0%E7%94%A8%E7%9A%84%E5%AD%97%E8%8A%82%E6%95%B0">基本数据类型占用的字节数</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%9C%80%E5%A4%A7%E5%80%BC%E6%9C%80%E5%B0%8F%E5%80%BC%E8%AE%A1%E7%AE%97">基本数据类型最大值/最小值计算</a></li>
+<li><a href="#jdk%E4%B8%AD%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%9C%80%E5%A4%A7%E5%80%BC%E6%9C%80%E5%B0%8F%E5%80%BC%E6%AF%94%E7%89%B9%E4%BD%8D">JDK中基础数据类型的最大值/最小值,比特位</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-zhu-jie/">
+              <h3 class="post-title">
+                Java基础篇 - 注解
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
