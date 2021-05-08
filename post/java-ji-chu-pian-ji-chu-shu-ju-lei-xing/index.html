@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Java基础篇 - 基础数据类型 | Huffman&#39;s Study Area</title>
-<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620469937069">
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620470349479">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Java基础篇 - 基础数据类型 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
@@ -52,7 +52,7 @@ lo..." />
       <div class="main-content">
         <div class="site-header">
   <a href="https://nojudgeme.github.io">
-  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1620469937069" alt="">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1620470349479" alt="">
   </a>
   <h1 class="site-title">
     Huffman&#39;s Study Area
@@ -173,7 +173,7 @@ lo..." />
 </table>
 <p>要了解各个基础数据类型的区别，需要简单了解计算机存储单元。</p>
 <h5 id="计算机存储单元">计算机存储单元</h5>
-<p>计算机系统数据只用0和1这种表现形式，一个0或者1占一个“位”，而系统中规定8个位为一个字节。电脑的各种存储器的最小的存储单位是比特，也就是位（bit，简称b），它表示一个二进制位。比位大的单位是字节（byte，简称B），它等于8个二进制位：1byte=8bit。它的二进制表示范围从<code>00000000</code><sub>`11111111`，换算成十进制是`0`</sub><code>255</code>，换算成十六进制是<code>00</code>~<code>ff</code>。</p>
+<p>计算机系统数据只用0和1这种表现形式，一个0或者1占一个“位”，而系统中规定8个位为一个字节。电脑的各种存储器的最小的存储单位是比特，也就是位（bit，简称b），它表示一个二进制位。比位大的单位是字节（byte，简称B），它等于8个二进制位：1byte=8bit。它的二进制表示范围从<code>00000000</code> ~ <code>11111111</code>，换算成十进制是<code>0</code> ~ <code>255</code>，换算成十六进制是<code>00</code> ~ <code>ff</code>。</p>
 <p>因为在存储器中含有大量的存储单元，每个存储单元可以存放8个二进制位，所以存储器的容量是以字节为基本单位的。</p>
 <p>每个英文字母要占<strong>一个字节(1byte)</strong>，一个汉字要占<strong>两个字节(2byte)</strong>。</p>
 <p>其它常用的单位还有千字节（Kilobyte，简称K或者KB，1KB等于1024B）、兆字节（Megabyte，简称M或者MB，1MB等于1024KB）和吉字节（Gigabyte，简称G或者GB，1GB等于1024MB）。<code>B = byte</code></p>
@@ -204,29 +204,29 @@ double │   │   │   │   │   │   │   │   │	8byte = 64bit
 <h5 id="基本数据类型最大值最小值计算">基本数据类型最大值/最小值计算</h5>
 <p>让我们以int类型为例，通过以位运算(二进制)的方式计算出int的最大值/最小值。我们规定最高位是符号位，0为正，1为负。</p>
 <pre><code class="language-java">          		  0   1   2   3   4   5   6  ... 32
-        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
- int初始值:      │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│	0 │
-        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+        		┌───┬───┬───┬───┬───┬───┬───┬───┬───┐
+ int初始值:      │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│ 0 │
+        		└───┴───┴───┴───┴───┴───┴───┴───┴───┘
 </code></pre>
 <p>当我们从最低位(32位)开始增加时，逢2进1</p>
 <pre><code class="language-java">          		  0   1   2   3   4   5   6  ... 32
-        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
- int初始值:      │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 1 │...│	0 │
-        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+        		┌───┬───┬───┬───┬───┬───┬───┬───┬───┐
+ 逢2进1:         │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │ 1 │...│ 0 │
+        		└───┴───┴───┴───┴───┴───┴───┴───┴───┘
 </code></pre>
 <p>​																					……</p>
 <p>一直增加至首位(1)为1时，最高位(0位) 为0时，int数最大</p>
 <pre><code class="language-java">          		  0   1   2   3   4   5   6  ... 32
-        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
- int最大值:      │ 0 │ 1 │ 1 │ 1 │ 1 │ 1 │ 1 │...│	1 │
-        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+        		┌───┬───┬───┬───┬───┬───┬───┬───┬───┐
+ int最大值:      │ 0 │ 1 │ 1 │ 1 │ 1 │ 1 │ 1 │...│ 1 │
+        		└───┴───┴───┴───┴───┴───┴───┴───┴───┘
 </code></pre>
 <p>至此，运算次数达到了<code>int.max = 2^31-1</code>次</p>
 <p>如果此时，再进一位<code>int.max+1</code>,就变成如下情况</p>
 <pre><code class="language-java">          		  0   1   2   3   4   5   6  ... 32
-        		┌───┬───┬───┬───┬───┬───┬───┐	┌───┐
- int最小值:      │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│	0 │
-        		└───┴───┴───┴───┴───┴───┴───┘	└───┘
+        		┌───┬───┬───┬───┬───┬───┬───┬───┬───┐
+ int最小值:      │ 1 │ 0 │ 0 │ 0 │ 0 │ 0 │ 0 │...│ 0 │
+        		└───┴───┴───┴───┴───┴───┴───┴───┴───┘
 </code></pre>
 <p>变成了<code>int.min =-2^31</code></p>
 <h5 id="jdk中基础数据类型的最大值最小值比特位">JDK中基础数据类型的最大值/最小值,比特位</h5>
