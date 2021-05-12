@@ -1,0 +1,471 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 反射 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1620799227994">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 反射 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="1.反射是什么
+在Java中,反射是指：可以通过程序在系统运行时(RetentionPolicy.Runtime描述过)，拿到指定对象所有信息。
+2.为什么需要使用到反射
+当程序运行时，我们并不知道这个指定对象是否存在，是否有目标属性，目标..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1620799227994" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 反射
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-05-12
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="1反射是什么">1.反射是什么</h4>
+<p>在Java中,反射是指：可以通过程序在系统运行时(RetentionPolicy.Runtime描述过)，拿到指定对象所有信息。</p>
+<h4 id="2为什么需要使用到反射">2.为什么需要使用到反射</h4>
+<p>当程序运行时，我们并不知道这个指定对象是否存在，是否有目标属性，目标方法时，就可以通过反射去取得该对象的信息。</p>
+<h4 id="3如何使用反射">3.如何使用反射</h4>
+<h5 id="javalang提供类">java.lang提供类</h5>
+<p>反射的核心包：java.lang.reflect，需要掌握如下标红的几个类</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/image-20210511171129193.png" alt="image-20210511171129193" loading="lazy"></figure>
+<p>以及核心的java.lang.Class类。该类提供了在运行时可以获取到类的所有信息。</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/image-20210511171251795.png" alt="image-20210511171251795" loading="lazy"></figure>
+<h5 id="掌握内容">掌握内容</h5>
+<pre><code class="language-java">	获取Class类对象的三种方式：
+    	1.实例对象.getClass();
+		2.类名.class;
+		3.Class.forName(&quot;实例对象完整类名&quot;);
+​	判断Class对象是否相等或有继承关系：
+    	1.使用 instanceof 关键字
+    	2.使用 class.isAssignableFrom(Class&lt;?&gt; cls)方法
+        //使用此方法时需要注意,参数(cls)是被检查对象,看cls是否能强制转型为class对象
+        //如:Object.class.isAssignableFrom(Integer.class) == true
+        //Integer.class.isAssignableFrom(Object.class) == false
+​	获取类对象的属性、构造器、方法：
+    	属性：	
+    		1.获取类所有public属性(包括父类的所有public属性):class.getFields();
+			2.获取类所有属性(不包括父类属性):class.getDeclaredFields();
+			3.设置属性的访问权限:Field.setAccessible(boolean flag);
+			4.取得/修改属性值:Field.get(属性名);/Filed.set(属性名,属性值);
+		构造器：
+            //构造器不被继承,所以取不到父类构造器,可以通过getSuperClass获取到父类对象再获取 
+            1.获取类所有public构造方法:class.getConstructors();
+            2.获取类所有构造方法:class.getDeclaredConstructors();
+            3.设置构造器的访问权限:Constructor.setAccessible(boolean flag);
+			4.新建构造器:class.getDeclaredConstructor(Paramater.class).newInstance();
+		方法:
+			1.获取类所有public方法(包括父类的所有public方法):class.getMethods();
+			2.获取类所有方法(不包括父类方法):class.getDeclaredMethods();
+			3.设置方法的访问权限:Method.setAccessible(boolean flag);
+			4.调用方法:Method.invoke(Object obj,Object...args);
+			//如果是静态实例,则obj=null,否则需要传入实例;如果是无参方法,则args=null,否则需要传入参数
+			//如果是多态实例,则总是调用的是传入实例的覆写方法,而不是父类方法
+​	动态加载：
+    	JVM并不会一次性加载所有的class文件至内存,而是会在运行时第一次碰到了需要的class文件就加载.
+</code></pre>
+<h5 id="使用场景">使用场景</h5>
+<p>利用动态加载的特性,在JVM运行时判断Class文件是否存在,动态配置JDBC驱动/日志库等</p>
+<pre><code class="language-java">/**
+ * 根据classpath下是否存在mysql/oracle驱动,选择连接哪个库
+ * @throws SQLException
+ */
+public static void dynamicConnectJDBCDriver() throws SQLException {
+    Connection connection = null;
+    if(isPresentClass(&quot;com.mysql.jdbc.Driver&quot;)){
+        connection = DriverManager.getConnection(&quot;jdbc:mysql://localhost:3306/test&quot;,&quot;test&quot;,&quot;test&quot;);
+    }else if(isPresentClass(&quot;oracle.jdbc.driver.OracleDriver&quot;)){
+        connection = DriverManager.getConnection(&quot;jdbc:oracle:thin@localhost:1521/test&quot;,&quot;test&quot;,&quot;test&quot;);
+    }else{
+        //todo:其他库
+    }
+    Statement statement = connection.createStatement();
+    statement.executeQuery(&quot;select * from user&quot;);
+    statement.close();
+    connection.close();
+}
+
+/**
+ * 类似commons logging和slf4j的作用-&gt;日志接口,动态检测并使用日志模块
+ * 日志接口具体的实现对应关系:commons logging(接口)使用log4j(实现);slf4j(接口)使用logback(实现)
+ */
+public static void dynamicDispositionLogFactory(){
+    LogFactory factory = null;
+    if (isPresentClass(&quot;ch.qos.logback.classic.LoggerContext&quot;)) {//logback库
+        factory = createLogback();
+    } else if(isPresentClass(&quot;org.apache.logging.log4j.Logger&quot;)){//log4j库
+        factory = createLog4j();
+    }else{//jdk log库
+        factory = createJdkLog();
+    }
+}
+
+/**
+ * 不能使用Class.forName()==null来判断是否存在,找不到只会直接抛出ClassNotFoundException异常
+ * @param clazzName
+ * @return
+ */
+public static boolean isPresentClass(String clazzName){
+    try {
+        Class.forName(clazzName);
+        return true;
+    }catch (ClassNotFoundException e){
+        return false;
+    }
+}
+</code></pre>
+<p>SpringMVC利用反射给JavaBean(提供private属性,get/set方法)动态赋值,通过请求参数,反射查找JavaBean的属性,调用set方法赋值.</p>
+<pre><code class="language-java">@RequestMapping(value = &quot;/test&quot;)
+@ResponseBody
+public String test(TestVO testVO) { 
+  String name= testVO.getName();
+}
+</code></pre>
+<h4 id="4动态代理">4.动态代理</h4>
+<h5 id="定义">定义</h5>
+<p>动态代理指的是:当jvm运行时,动态创建某个接口(interface)的实例.</p>
+<p>(没有.java文件,只有生成的.class文件:public class $Proxy0 extends Proxy implements 接口)</p>
+<h5 id="使用方式">使用方式</h5>
+<pre><code class="language-java">/**
+ * 反射实现动态代理三部曲
+ * 1.创建InvocationHandler对象,通过匿名内部类实现invoke方法
+ * 2.通过Proxy.newInstance创建Proxy代理对象,传入代理类的classloader,代理类的class数组,和刚刚实现的invoke()方法
+ * 3.通过返回的代理对象Object,强制向下转型,调用方法
+ */
+public class DynamicProxy {
+
+    /**
+     * 实现代理对象的抽象方法
+     * @return
+     */
+    public static InvocationHandler invoke(){
+        return (proxy, method, args) -&gt; {
+            //public abstract void org.pzzhang.reflection.DynamicProxy$Hello.hello()
+            System.out.println(method);
+            if(Hello.class.getMethod(&quot;hello&quot;).equals(method)){
+                System.out.println(&quot;hello world&quot;);
+            }
+            if(Hello.class.getMethod(&quot;hey&quot;, String.class).equals(method)){
+                System.out.println(&quot;hey,&quot;+args[0]);
+            }
+            return null;
+        };
+    }
+    
+    /**
+     * 创建代理对象,其中代理对象的方法已经通过InvocationHandler实现
+     * 直接将代理对象强制转型为目标对象,调用目标对象的方法即可
+     */
+    public static void proxyHandler(){
+        Hello proxyInstance = (Hello)Proxy.newProxyInstance(Hello.class.getClassLoader(), new Class[]{Hello.class}, invoke());
+        proxyInstance.hello();
+        proxyInstance.hey(&quot;charles&quot;);
+    }
+
+}
+interface Hello{
+    void hello();
+    void hey(String name);
+}
+</code></pre>
+<p>等价于如下静态代理实现类</p>
+<pre><code class="language-java">class DynamicProxyStaticImplements implements Hello{
+
+    private final InvocationHandler invocationHandler;
+
+    public DynamicProxyStaticImplements(InvocationHandler invocationHandler) {
+        this.invocationHandler = invocationHandler;
+    }
+
+    @Override
+    public void hello() {
+        try {
+            invocationHandler.invoke(this,Hello.class.getMethod(&quot;hello&quot;),null);//没有参数,所以args=null
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    @Override
+    public void hey(String name) {
+        try {
+            invocationHandler.invoke(this,Hello.class.getMethod(&quot;hey&quot;, String.class),new Object[]{name});
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args){
+        DynamicProxyStaticImplements staticImplements = new DynamicProxyStaticImplements((proxy, method, args1) -&gt; {
+            if (Hello.class.getMethod(&quot;hello&quot;).equals(method)) {
+                System.out.println(&quot;hello world&quot;);
+            }
+            if (Hello.class.getMethod(&quot;hey&quot;, String.class).equals(method)) {
+                System.out.println(&quot;hey,&quot; + args1[0]);
+            }
+            return null;
+        });
+        staticImplements.hello();
+        staticImplements.hey(&quot;charles&quot;);
+    }
+}
+</code></pre>
+<h5 id="使用场景-2">使用场景</h5>
+<p>利用动态代理,对方法增强.在方法执行前后执行事务/输出日志等操作</p>
+<pre><code class="language-java">public interface SQL {
+
+    void executeSQL();
+}
+
+class Executor implements SQL{
+
+    @Override
+    public void executeSQL() {
+        Logger.getGlobal().info(&quot;select * from user&quot;);
+    }
+}
+
+/**
+ * 三部曲:
+ * 1.创建InvokeHandler对象,处理method方法,进行方法加强(开启/关闭事务,打印输出日志)
+ * 2.通过Proxy.newInstance创建代理对象,传入参数
+ * 3.转化成实际对象,执行目标方法
+ */
+class Test{
+
+    private static Logger global = Logger.getGlobal();
+
+    public static InvocationHandler invoke(){
+        return (proxy, method, args) -&gt; {
+            if(method.equals(SQL.class.getMethod(&quot;executeSQL&quot;))){
+                global.info(&quot;开启数据库连接&quot;);
+                Connection conn = openConnection();//创建数据库连接
+                global.info(&quot;开启事务&quot;);
+                conn.setAutoCommit(false);//关闭自动提交
+                method.invoke(new Executor());//执行目标SQL
+                global.info(&quot;事务处理完毕,提交事务&quot;);
+                conn.commit();//提交事务
+                global.info(&quot;关闭数据库连接&quot;);
+                conn.close();
+            }
+            return null;
+        };
+    }
+
+     private static Connection openConnection() {
+        try {
+            return  DriverManager.getConnection(&quot;jdbc:mysql://localhost:3306/test&quot;,&quot;root&quot;,&quot;123456&quot;);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return null;
+        }
+    }
+    
+    public static void main(String[] args){
+        SQL sql = (SQL)Proxy.newProxyInstance(SQL.class.getClassLoader(), new Class[]{SQL.class}, invoke());
+        sql.executeSQL();
+    }
+}
+</code></pre>
+<p>执行结果:</p>
+<figure data-type="image" tabindex="3"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210512135749.png" alt="截图_选择区域_20210512135749" loading="lazy"></figure>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1%E5%8F%8D%E5%B0%84%E6%98%AF%E4%BB%80%E4%B9%88">1.反射是什么</a></li>
+<li><a href="#2%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8%E5%88%B0%E5%8F%8D%E5%B0%84">2.为什么需要使用到反射</a></li>
+<li><a href="#3%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E5%8F%8D%E5%B0%84">3.如何使用反射</a>
+<ul>
+<li><a href="#javalang%E6%8F%90%E4%BE%9B%E7%B1%BB">java.lang提供类</a></li>
+<li><a href="#%E6%8E%8C%E6%8F%A1%E5%86%85%E5%AE%B9">掌握内容</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF">使用场景</a></li>
+</ul>
+</li>
+<li><a href="#4%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86">4.动态代理</a>
+<ul>
+<li><a href="#%E5%AE%9A%E4%B9%89">定义</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F">使用方式</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF-2">使用场景</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-zhu-jie/">
+              <h3 class="post-title">
+                Java基础篇 - 注解
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
