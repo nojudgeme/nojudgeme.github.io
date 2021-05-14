@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-05-12T06:00:30.639Z</updated>
+    <updated>2021-05-14T02:11:00.286Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -10,6 +10,438 @@
     <logo>https://nojudgeme.github.io/images/avatar.png</logo>
     <icon>https://nojudgeme.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Huffman&apos;s Study Area</rights>
+    <entry>
+        <title type="html"><![CDATA[Java基础篇 - 泛型]]></title>
+        <id>https://nojudgeme.github.io/post/java-ji-chu-pian-fan-xing/</id>
+        <link href="https://nojudgeme.github.io/post/java-ji-chu-pian-fan-xing/">
+        </link>
+        <updated>2021-05-14T02:10:06.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="1泛型是什么">1.泛型是什么</h4>
+<p>在java中,泛型是指:参数化类型-即把类型当做参数传递,当调用类/方法时,传递指定类型.是一种通用的代码模板处理手段,利用泛型,可以使一套代码,多种使用方式.</p>
+<h4 id="2为什么要使用泛型">2.为什么要使用泛型</h4>
+<ol>
+<li>使代码更加简洁，不必进行强制类型转换，避免了<code>ClassCastException</code>异常。</li>
+<li>使代码更具有通用性，避免了重复代码。</li>
+</ol>
+<h4 id="3使用泛型">3.使用泛型</h4>
+<h5 id="定义泛型">定义泛型</h5>
+<pre><code class="language-java">/**
+ * 泛型类
+ * @param &lt;K&gt; key的类型
+ * @param &lt;V&gt; value的类型
+ */
+public class Pair &lt;K,V&gt;{
+    
+    private final K key;
+    private final V value;
+    //编译器提示出错:org.pzzhang.generics.Pair.this' cannot be referenced from a static context,泛型使用不能在静态成员变量上
+    //private static K staticProperty;
+
+    /**
+     * 无法直接通过new K/V()的方式进行初始化
+     * this.key = new K(); type parameter 'K' cannot be instantiated directly
+     *  his.value = new V(); type parameter 'V' cannot be instantiated directly
+     *  可以采用如下两种方式进行初始化
+     */
+
+    //1.通过Object强制转换为目标类型
+    public Pair() {
+        this.key = (K) new Object();
+        this.value = (V) new Object();
+    }
+
+    //2.通过指定K,V的class,使用Class.newInstance()方法
+    public Pair(Class&lt;K&gt; kClass,Class&lt;V&gt; vClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        this.key = kClass.getDeclaredConstructor().newInstance();
+        this.value = vClass.getDeclaredConstructor().newInstance();
+    }
+
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    /**
+     * 注意:此处的createPairs的方法与下面createPari方法并不一致
+     * 此处定义的泛型K,V跟Pair.class定义的泛型K,V没有关系
+     * 此处定义的泛型由返回值前面定义的&lt;K,V&gt;相关,它也可以是&lt;T,B&gt; 效果是相等的
+     * 而createPair方法参数类型的K,V才是由Pair.class定义的泛型K,V,它不能是T,B,编译器会提示Cannot resolve symbol 'T,B'
+     * 所以createPairs == createPairs2 != createPair
+     * @return
+     */
+    public static &lt;K,V&gt; Pair&lt;K,V&gt; createPairs(K key,V value){
+        return new Pair&lt;&gt;(key,value);
+    }
+
+    /**
+     * 泛型方法 - 使用由类定义的泛型K,V
+     * @param key
+     * @param value
+     * @return
+     */
+    public  Pair&lt;K,V&gt; createPair(K key, V value){
+        return new Pair&lt;&gt;(key,value);
+    }
+
+    /**
+     * 静态泛型方法 - 使用由方法中返回值前定义的泛型T,B;与类定义的泛型无关
+     * @param key
+     * @param value
+     * @param &lt;T&gt;
+     * @param &lt;B&gt;
+     * @return
+     */
+    public static &lt;T,B&gt; Pair&lt;T,B&gt; createPairs2(T key,B value){
+        return new Pair&lt;&gt;(key,value);
+    }
+    
+    /*
+    编译器出错,提示Cannot resolve symbol 'T,B'
+    public static Pair&lt;T,B&gt; createPairs3(T key,B value){
+        return new Pair&lt;&gt;(key,value);
+    }*/
+
+    public final K getKey() {
+        return key;
+    }
+
+    public final V getValue() {
+        return value;
+    }
+}
+</code></pre>
+<h5 id="使用泛型">使用泛型</h5>
+<pre><code class="language-java">public static void main(String[] args){
+  Pair&lt;String, Object&gt; pair = new Pair&lt;&gt;(&quot;charles&quot;,123);
+  //泛型限制了传入K,V类型只能是String,Object
+  System.out.println(String.format(&quot;key:%s,value:%s&quot;,pair.getKey(),pair.getValue()));
+  //key:charles,value:123
+    
+  Pair&lt;String, String&gt; pair2 = new Pair&lt;&gt;(&quot;锁&quot;,&quot;钥匙&quot;);
+  //泛型限制了传入K,V类型只能是String,String
+  System.out.println(String.format(&quot;key:%s,value:%s&quot;,pair2.getKey(),pair2.getValue()));
+  //key:锁,value:钥匙
+    
+  Pair&lt;String, Integer&gt; pair3 = Pair.createPairs2(&quot;锁密码&quot;, 123);
+  //静态泛型方法参数决定了返回值类型为String,Integer
+  System.out.println(String.format(&quot;key:%s,value:%s&quot;,pair3.getKey(),pair3.getValue()));
+  //key:锁密码,value:123
+}
+</code></pre>
+<h4 id="4泛型擦除">4.泛型擦除</h4>
+<h5 id="泛型擦除定义">泛型擦除定义</h5>
+<p>泛型擦除是什么?泛型擦除其实就是Java实现泛型的方式.在编译阶段,编译器已经强制转型为目标类型了,如:<code>Pair&lt;K.class,V.class&gt; pair = (Pair&lt;K.class,V.class&gt;)new Pair&lt;Object,Object&gt;();</code>,在运行阶段,JVM看不到K,V了,只有Pair.class.让我们看一个例子:</p>
+<pre><code class="language-java">public static void main(String[] args){
+    Pair&lt;String,Object&gt; pairEx1 = new Pair&lt;&gt;();
+	Pair&lt;Integer,String&gt; pairEx2 = new Pair&lt;&gt;();
+	System.out.println(Pair.getClass().equals(Pair.getClass()));//true
+}
+//class在JVM中只有独一份,结果等于true.
+//说明在运行期间JVM认为Pair&lt;String,Object&gt;==Pair&lt;Integer,String&gt;.
+//即只存在一个PairExClass.
+</code></pre>
+<h5 id="泛型擦除后的信息">泛型擦除后的信息</h5>
+<p>那么又产生了一个新的问题:发生了泛型擦除,那我在运行期还能否获取到泛型的具体类型呢?看下面的例子</p>
+<pre><code class="language-java">public static void main(String[] args){
+    Type pairExType = PairExClass.class.getGenericSuperclass();
+    if(pairExType instanceof ParameterizedType){//判断父类Class是否是参数化类型(泛型类)
+        for (Type actualTypeArgument : ((ParameterizedType) pairExType).getActualTypeArguments()) {
+            System.out.println(actualTypeArgument.getTypeName());
+            //输出K,V
+        }
+    }
+
+    Type pairEx1Type = PairExClass1.class.getGenericSuperclass();
+    if(pairEx1Type instanceof ParameterizedType){//判断父类Class是否是参数化类型(泛型类)
+        for (Type actualTypeArgument : ((ParameterizedType) pairEx1Type).getActualTypeArguments()) {
+            System.out.println(actualTypeArgument.getTypeName()); 
+            //输出java.lang.String;java.lang.Object;
+        }
+    }
+}
+</code></pre>
+<p>从上述输出结果中可以明确看到,在运行期又可以拿到泛型的信息.这是为什么?</p>
+<blockquote>
+<p>Pair字节码文件:</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_jetbrains-idea_20210513153421.png" alt="截图_jetbrains-idea_20210513153421" loading="lazy"></figure>
+<p>可以从Pair的字节码文件中观察到:class信息上没有了泛型的信息.</p>
+<p>上面的注释中signature标明了Pair的泛型信息为(K:java.lang.Object,V:java.lang.Object).</p>
+<p>而declaration标明了类信息为:Pair&lt;K,V&gt;</p>
+</blockquote>
+<blockquote>
+<p>PairExClass字节码文件:</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_jetbrains-idea_20210513153948.png" alt="截图_jetbrains-idea_20210513153948" loading="lazy"></figure>
+<p>可以从PairExClass的字节码文件中观察到:class信息上没有了泛型的信息.</p>
+<p>上面的注释中signature标明了PairExClass的泛型信息为(K:java.lang.Object,V:java.lang.Object).Pair的泛型信息为&lt;TK,TV&gt;</p>
+<p>而declaration标明了类的继承关系:PairExClass&lt;K,V&gt; extends Pair&lt;K,V&gt;</p>
+</blockquote>
+<p>所以在字节码文件中,signature可以取到泛型的具体类型.如果是K,V类型没有指定的情况,返回java.lang.Object;否则返回具体的指定类型.</p>
+<h5 id="不恰当的覆写方法">不恰当的覆写方法</h5>
+<p>当我们编写equals方法时,编译器提示:</p>
+<pre><code class="language-java">/**
+ * 编译不通过,编译提示:
+ * 'equals(K)' in 'org.pzzhang.generics.Pair' clashes with 'equals(Object)' in    
+ * 'java.lang.Object'; both methods have same erasure, yet neither overrides the other
+ * @param o
+ * @return
+ */
+public boolean equals(K o) {
+    return this == o;
+}
+
+/**
+ * 编译通过
+ */
+public boolean equals(String str){
+    return this.toString().equals(str);
+}
+</code></pre>
+<p>可是问题是,我们的类型K又不一定会是Object,这应该算是方法的重载而不是重写.为什么会出现这样的情况?</p>
+<p>是因为在发生了泛型擦除之后,没有指定的K类型如上述所说会被编译成java.lang.Object;则equals方法就和父类Object中的equals方法完全一致.那么正确的的做法是什么?</p>
+<pre><code class="language-java">/**
+ * 编译通过
+ * 方法名不一致,避免了冲突,则自然不会重写父类的方法
+ */
+public boolean isSame(K v){
+	return this == v;
+}
+</code></pre>
+<h5 id="泛型的限制">泛型的限制</h5>
+<p>正因为泛型擦除的存在,在编译时将泛型类型擦除为了Object,那么就会存在如下问题</p>
+<ol>
+<li>
+<p>泛型类型不能为基础数据类型</p>
+<pre><code class="language-java">/**
+ * 编译不通过
+ * 编译错误:Type argument cannot be of primitive type
+ * class PairExClass3 extends Pair&lt;int&gt;{}
+ */
+</code></pre>
+</li>
+<li>
+<p>无法获取到泛型的Class</p>
+<pre><code class="language-java">Type pairEx1Type = PairExClass1.class.getGenericSuperclass();
+if(pairEx1Type instanceof ParameterizedType){//判断父类Class是否是参数化类型(泛型类)
+    for (Type actualTypeArgument : ((ParameterizedType) pairEx1Type).getActualTypeArguments()) {
+        System.out.println(&quot;class :&quot;+actualTypeArgument.getClass());
+        //输出java.lang.String;java.lang.Object;
+    }
+}
+</code></pre>
+</li>
+<li>
+<p>无法判断带泛型的类型</p>
+<pre><code class="language-java">/**
+ * 无法通过编译:Illegal generic type for instanceof
+ * PairExClass&lt;String,Object&gt; pairExClass = new PairExClass&lt;&gt;();
+ * System.out.println(pairExClass instanceof PairExClass&lt;String, Object&gt;);
+ */
+</code></pre>
+</li>
+<li>
+<p>不能直接实例化泛型类型</p>
+<pre><code class="language-java">/**
+ * 无法通过编译:type parameter 'K,V' cannot be instantiated directly
+ * this.key = new K();
+ * this.value = new V();
+ */
+</code></pre>
+</li>
+</ol>
+<h4 id="5泛型的继承关系">5.泛型的继承关系</h4>
+<p>我们知道,Java中提供了关键字extends表示类的继承关系.那么能否直接通过extends继承泛型类呢?</p>
+<pre><code class="language-java">/**
+ * 编译通过
+ * @param &lt;K&gt; 指定泛型类型为K
+ * @param &lt;V&gt; 指定泛型类型为V
+ */
+public class PairExClass&lt;K,V&gt; extends Pair&lt;K,V&gt;{
+
+    @Override
+    public Pair&lt;K, V&gt; createPair(K key, V value) {
+        return super.createPair(key, value);
+    }
+}
+
+/**
+ * 编译通过
+ * K:指定泛型类型为String
+ * V:指定泛型类型为Object
+ */
+class PairExClass1 extends Pair&lt;String,Object&gt;{
+
+    /**
+     * Pair的父类方法中,所有的泛型K类型都变成了String,泛型V变成了Object
+     * @param key
+     * @param value
+     * @return
+     */
+    @Override
+    public Pair&lt;String, Object&gt; createPair(String key, Object value) {
+        return super.createPair(key, value);
+    }
+}
+
+/**
+ * 编译不通过
+ * 编译错误:Cannot resolve symbol 'K,V'
+ * class PairExClass2 extends Pair&lt;K,V&gt;{
+ *     @Override
+ *     public Pair&lt;K, V&gt; createPair(K key, V value) {
+ *         return super.createPair(key, value);
+ *     }
+ * }
+ */
+</code></pre>
+<h4 id="6泛型的通配符">6.泛型的通配符</h4>
+<h5 id="extends通配符">extends通配符</h5>
+<pre><code class="language-java">/**
+ * extends定义泛型类
+ * 泛型限制传入参数类型必须继承于Number
+ * @param &lt;N&gt; 参数类型
+ */
+public class PairGenericExClass &lt;N extends Number&gt;{
+
+    private final N key;
+
+    public PairGenericExClass(N key) {
+        this.key = key;
+    }
+
+     /**
+     * extends定义泛型方法参数
+     */
+    public boolean containKeyOrAddKey(List&lt;? extends Integer&gt; list){
+        for (Integer integer : list) {
+            if(integer.equals(key)) return true;
+        }
+        // 编译错误,无法添加: Required type:capture of ? extends Integer
+        //Integer key = (Integer) this.key;
+        //list.add(key);
+        return false;
+    }
+    
+    public static void main(String[] args){
+        PairGenericExClass&lt;Integer&gt; integerPair = new PairGenericExClass&lt;&gt;(123);
+        PairGenericExClass&lt;Double&gt; doublePair = new PairGenericExClass&lt;&gt;(123d);
+        //编译错误,Type parameter 'java.lang.String' is not within its bound; should extend 'java.lang.Number'
+        //PairGenericExClass&lt;String&gt; stringPair = new PairGenericExClass&lt;&gt;(&quot;123&quot;);
+       System.out.println(integerPair.containKeyOrAddKey(Arrays.asList(123,456)));//true
+    } 
+}
+</code></pre>
+<p>显而易见:</p>
+<ol>
+<li>
+<p>在使用extends修饰泛型类时,限制了泛型类型只能是Number以及Number的子类,String无法通过编译;</p>
+</li>
+<li>
+<p>在使用extends修饰方法泛型参数时,可以获取到list所有元素,但限制了对list元素进行修改操作.(只读)</p>
+</li>
+</ol>
+<h5 id="super通配符">super通配符</h5>
+<pre><code class="language-java">/**
+ * 编译错误:不支持的语法
+ * class PairGenericSuClass2 &lt;P super Number&gt;{}
+ */
+public class PairGenericSuClass{
+
+    private final Integer key;
+    private final Integer value;
+
+    public PairGenericSuClass(Integer key, Integer value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public Pair resetPair(Pair&lt;? super Integer,? super Integer&gt; pair) {
+        return pair.createPair(key,value);
+    }
+
+
+    public static void main(String[] args){
+        PairGenericSuClass pairGenericSuClass = new PairGenericSuClass(5, 7);
+        Pair pair = pairGenericSuClass.resetPair(new Pair&lt;&gt;());
+        System.out.println(&quot;pair key:&quot;+pair.getKey()+&quot;,pair value:&quot;+pair.getValue());
+        //pair key:5,pair value:7
+        Pair pair2 = pairGenericSuClass.resetPair(new Pair&lt;&gt;());
+        System.out.println(&quot;pair2 key:&quot;+pair2.getKey()+&quot;,pair2 value:&quot;+pair2.getValue());
+        //pair2 key:5,pair2 value:7
+
+        //虽然我们明确知道pair.getKey()的值是int类型,但由于它既可能是int类型,还可以是Number类型,甚至是Object类型
+        //所以我们只能通过Object去接受它,否则编译器会提示Provide type:Object,Required type:Integer,无法通过编译
+        //Integer key = pair.getKey();
+    }
+}
+</code></pre>
+<p>显而易见:</p>
+<ol>
+<li>
+<p>super无法像extends那样修饰泛型类</p>
+</li>
+<li>
+<p>super修饰方法泛型参数时,可以修改原Pair泛型为&lt;? super Integer&gt;的key,value值.但无法正确接收key,value,只能用Object类型接收.(只写)</p>
+</li>
+</ol>
+<h5 id="pecs原则">PECS原则</h5>
+<p>为了方便记忆extends与super的区别,我们引入一个概念<code>PECS:Producer Extends Consumer Super</code>.</p>
+<p>即:如果需要返回<code>T</code>，它是生产者（Producer），要使用<code>extends</code>通配符；如果需要写入<code>T</code>，它是消费者（Consumer），要使用<code>super</code>通配符.</p>
+<pre><code class="language-java">public class Collections {
+    public static &lt;T&gt; void copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src) {
+        for (int i=0; i&lt;src.size(); i++) {
+            T t = src.get(i); // src是producer
+            dest.add(t); // dest是consumer
+        }
+    }
+}
+</code></pre>
+<h5 id="通配符">? 通配符</h5>
+<pre><code class="language-java">/**
+ * 编译错误:不支持的语法
+ * class PairGenericUnlimitedClass &lt;?&gt;{}
+ */
+public class PairGenericUnlimitedClass&lt;T&gt; {
+
+    private final List&lt;T&gt; list;
+
+    public PairGenericUnlimitedClass(List&lt;T&gt; list) {
+        this.list = list;
+    }
+
+    public static boolean isEmpty(List&lt;?&gt; list){
+        return list.size() == 0;
+    }
+
+    public static void addElementIfEmpty(List&lt;?&gt; list){
+        if(isEmpty(list)){
+            //无法通过编译:Required type:capture of ? Provided:int
+            //list.add(123);
+        }
+        Object o = list.get(1);//无法拿任何类型去接受它,只有Object
+    }
+
+    public static void main(String[] args){
+        PairGenericUnlimitedClass&lt;Integer&gt; pair = new PairGenericUnlimitedClass&lt;&gt;(Arrays.asList(123, 456, 789));
+        PairGenericUnlimitedClass&lt;?&gt; newPair = pair;//编译通过
+    }
+}
+</code></pre>
+<p>结论:</p>
+<ol>
+<li>?不能修饰泛型类</li>
+<li>?是泛型T的超类</li>
+<li>?具有<code>extends</code>和<code>super</code>的特征(无法写;无法读),因为无法读写,一般只能用来判空,所以我们一般用的更多的是直接使用<code>泛型T</code>替代<code>?</code>通配符;</li>
+</ol>
+<h5 id="不可读与不可写">不可读与不可写</h5>
+<p>关于读写问题解读,我的理解是:</p>
+<p><strong>不可写</strong>:</p>
+<p>可读:当使用<code>? extends T</code>时,<code>泛型T</code>为所有的类型顶点,所有类型都可以向上转型至<code>T类型</code>,我们可以直接这样写<code>T t = ?</code>,拿<code>T类型</code>去接收实例,跟面向接口编程的思想一致,都拿接口去接收实例.那自然都可读,都当做<code>T类型</code>处理.</p>
+<p>不可写:假设<code>T类型</code>为<code>Number类型</code>,那么我即可以写入<code>Integer类型</code>,也可以写入<code>Double类型</code>,但是很明显<code>T类型(Number)</code>它不可能同时既是<code>Integer类型</code>又是<code>Double类型</code>,所以说不可写.</p>
+<p><strong>不可读</strong>:</p>
+<p>可写:当使用<code>? super T</code>时,<code>泛型T</code>为所有类型的底点,<code>T类型</code>是继承于他们的.假设<code>T类型</code>为<code>Integer类型</code>,那我们只能写入<code>Integer类型,Number类型,Object类型</code>.我们可以把他们都转型转为<code>Obejct类型</code>写入.</p>
+<p>不可读:正因为我们可以把他们都转型为<code>Object类型</code>写入,那我们最终只能拿<code>Object类型</code>接收,否则你根本不知道你写入的到底是<code>Integer类型</code>和<code>Number类型</code>,所以说不可读.</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java基础篇 - 反射]]></title>
         <id>https://nojudgeme.github.io/post/java-ji-chu-pian-fan-she/</id>
