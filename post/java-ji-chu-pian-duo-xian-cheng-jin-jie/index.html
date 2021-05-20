@@ -1,0 +1,751 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 多线程 - 进阶 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1621492657612">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 进阶 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Java内存模型(JMM)
+在多线程-基础介绍篇章中,我们介绍过线程是进程的子集,一个进程是拥有多线程来处理任务的.这么线程它们共享使用该进程的系统资源给它分配的空间.
+系统资源分配进程空间的内容:
+
+图片来源:https://www.no..." />
+    <meta name="keywords" content="内存模型,死锁,多线程,java" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1621492657612" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 多线程 - 进阶
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-05-20
+              </span>
+              <span>
+                19 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/Mj_GOirdP/" class="post-tag">
+                  # 内存模型
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/Na-K9RLU5J/" class="post-tag">
+                  # 死锁
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/UQVDT19g1/" class="post-tag">
+                  # 多线程
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="java内存模型jmm">Java内存模型(JMM)</h4>
+<p>在多线程-基础介绍篇章中,我们介绍过线程是进程的子集,一个进程是拥有多线程来处理任务的.这么线程它们共享使用该进程的系统资源给它分配的空间.</p>
+<p>系统资源分配进程空间的内容:</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/983343709_1600233897382_4A47A0DB6E60853DEDFCFDF08A5CA249" alt="" loading="lazy"></figure>
+<p>图片来源:https://www.nowcoder.com/discuss/512320?channel=-2&amp;source_id=discuss_terminal_discuss_sim</p>
+<p>在Java多线程的实现中,使用<code>共享内存</code>模型:</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/v2-455827bbb5173b54463906564870a3ee_720w.jpg" alt="" loading="lazy"></figure>
+<p>图片来源:https://zhuanlan.zhihu.com/p/87782307</p>
+<ol>
+<li>每一个线程享有自己的<strong>独立工作内存</strong>,<strong>共享主内存</strong>,并存有<strong>主内存</strong>的变量副本-<strong>共享变量</strong>.</li>
+<li>线程对自己的<strong>工作内存</strong>中的共享变量进行读写操作,然后再同步到<strong>主内存</strong>中.</li>
+<li><strong>工作内存</strong>中不能生成新的变量,新增变量只会存在<strong>主内存</strong>中,然后共享.</li>
+<li><strong>工作内存</strong>之间无法相互访问变量,只能同步到<strong>主内存</strong>中,访问<strong>主内存</strong>的共享变量.</li>
+</ol>
+<h4 id="内存的交互操作">内存的交互操作</h4>
+<ol>
+<li>lock(锁定):作用于主内存的变量,把一个变量标识为一条线程独占状态</li>
+<li>unlock(解锁):作用于主内存的变量,把一个处于锁定状态的变量释放出来,释放后的变量才可以被其他线程锁定</li>
+<li>read(读取):作用于主内存变量，把主内存的一个变量读取到工作内存中</li>
+<li>load(载入):作用于工作内存，把read操作读取到工作内存的变量载入到工作内存的变量副本中</li>
+<li>use(使用):作用于工作内存的变量，把工作内存中的变量值传递给一个执行引擎</li>
+<li>assign(赋值):作用于工作内存的变量。把执行引擎接收到的值赋值给工作内存的变量</li>
+<li>store(存储):把工作内存的变量的值传递给主内存</li>
+<li>write(写入):把store操作的值入到主内存的变量中</li>
+</ol>
+<h5 id="注意事项">注意事项</h5>
+<ol>
+<li>不允许read、load、store、write操作之一单独出现</li>
+<li>不允许一个线程丢弃assign操作</li>
+<li>不允许一个线程不经过assign操作，就把工作内存中的值同步到主内存中</li>
+<li>一个新的变量只能在主内存中生成</li>
+<li>一个变量同一时刻只允许一条线程对其进行lock操作.但lock操作可以被同一条线程执行多次,只有执行相同次数的unlock操作,变量才会解锁</li>
+<li>如果对一个变量进行lock操作,将会清空工作内存中此变量的值,在执行引擎使用这个变量前,需要重新执行load或者assign操作初始化变量的值</li>
+<li>如果一个变量没有被锁定,不允许对其执行unlock操作,也不允许unlock一个被其他线程锁定的变量</li>
+<li>对一个变量执行unlock操作之前,需要将该变量同步回主内存中</li>
+</ol>
+<blockquote>
+<p>为了使我们能正确的操作线程,我们需要理解如下概念:可见性、原子性、线程封闭、不可变性</p>
+</blockquote>
+<h4 id="可见性">可见性</h4>
+<p>可见性:指当某一个线程修改了变量,其他的线程能立刻看到修改后的变量.(<strong>针对变量</strong>)</p>
+<p>Java提供了关键字<code>volatile</code>来实现可见性,其保证如下效果:</p>
+<ol>
+<li>每次访问变量时,总是获取主内存的最新值.</li>
+<li>每次修改变量时,立刻写回到主内存.</li>
+<li>防止指令重排(指令重排:程序执行的时候，CPU、编译器可能会<strong>对执行顺序做一些优化调整</strong>，导致执行的顺序并不是从上往下的)</li>
+</ol>
+<pre><code class="language-java">/**
+ * volatile:
+ * 某线程修改变量时,该变量对其他线程可见
+ */
+public class VolatileLearn {
+
+    private volatile boolean isRunning = true;
+
+    private static void useVolatile() throws InterruptedException {
+        VolatileLearn volatileLearn = new VolatileLearn();
+
+        Thread thread = new Thread(() -&gt; {
+            while (volatileLearn.isRunning) {//thread线程读isRunning状态
+                System.out.println(Thread.currentThread().getName() + &quot; is running&quot;);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, &quot;volatile-thread-a&quot;);
+
+        thread.start();
+        Thread.sleep(1000);
+        volatileLearn.isRunning = false;//main线程写isRunning状态
+        thread.join();
+        System.out.println(thread.getState());
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        useVolatile();
+        //执行结果:
+        //volatile-thread-a is running
+		//volatile-thread-a is running
+		//TERMINATED
+    }
+}
+</code></pre>
+<blockquote>
+<p>如果不保证，仍以x86架构为例，JVM对volatile变量的处理如下：</p>
+<ul>
+<li>在写volatile变量v之后，插入一个sfence。这样，sfence之前的所有store（包括写v）不会被重排序到sfence之后，sfence之后的所有store不会被重排序到sfence之前，禁用跨sfence的store重排序；且sfence之前修改的值都会被写回缓存，并标记其他CPU中的缓存失效。</li>
+<li>在读volatile变量v之前，插入一个lfence。这样，lfence之后的load（包括读v）不会被重排序到lfence之前，lfence之前的load不会被重排序到lfence之后，禁用跨lfence的load重排序；且lfence之后，会首先刷新无效缓存，从而得到最新的修改值，与sfence配合保证内存可见性。</li>
+</ul>
+<p>在另外一些平台上，JVM使用mfence代替sfence与lfence，实现更强的语义。</p>
+<p>二者结合，共同实现了Happens-Before关系中的volatile变量规则。</p>
+</blockquote>
+<h4 id="原子性">原子性</h4>
+<p>原子性:指一个或一系列的不可中断的操作.(<strong>针对方法</strong>)</p>
+<p>Java提供了关键字<code>synchronized</code>来实现原子性,其保证如下效果:</p>
+<ol>
+<li><code>synchronized是一种互斥锁</code>,当修饰方法时,保证只允许一个线程能运行该方法直至运行结束释放锁.</li>
+<li><code>synchronized是一种内置锁</code>,当修饰对象时,保证只运行一个线程能运行该代码块的内容直至运行结束释放锁.</li>
+<li>被修饰的方法/代码块顺序执行,修改后变量对其他线程可见.</li>
+</ol>
+<pre><code class="language-java">/**
+ * synchronized:
+ * 修饰方法时,为互斥锁,只允许一个线程运行该方法直至运行结束释放锁
+ * 修饰对象时,为内置锁,只允许一个线程运行该代码块的内容直至运行结束释放锁
+ */
+public class SynchronizedLearn {
+
+    public static void main(String[] args) throws InterruptedException {
+        Counter counter = new Counter();
+        Thread threadA = new Thread(() -&gt; {
+            for (int i = 0; i &lt; 10; i++) {
+                counter.increase();
+            }
+        }, &quot;synchronized-thread-a&quot;);
+        Thread threadB = new Thread(() -&gt; {
+            for (int i = 0; i &lt; 10; i++) {
+                counter.decrease();
+            }
+        }, &quot;synchronized-thread-b&quot;);
+        threadA.start();
+        threadB.start();
+        threadA.join();
+        threadB.join();
+        System.out.println(&quot;最后的总数:&quot; + counter.getCount());
+    }
+
+    private static class Counter {
+        static int count = 0;
+
+        public void decrease() {
+            synchronized (this) {//锁住当前实例对象
+                System.out.println(Thread.currentThread().getName() + &quot;执行decrease方法&quot;);
+                System.out.println(Thread.currentThread().getName() + &quot;进行count--&quot;);
+                count--;
+            }
+        }
+
+        public void increase() {
+            synchronized (this) {//锁住当前实例对象
+                System.out.println(Thread.currentThread().getName() + &quot;执行increase方法&quot;);
+                System.out.println(Thread.currentThread().getName() + &quot;进行count++&quot;);
+                count++;
+            }
+        }
+
+        public int getCount() {
+            System.out.println(Thread.currentThread().getName() + &quot;获取count&quot;);
+            return count;
+        }
+
+        /**
+         * 锁住当前方法
+         * 当使用synchronized (this) {//所有代码}时,其实等价于直接使用synchronized修饰方法
+         * decrease() == synDecrease()
+         */
+        public synchronized void synDecrease() {
+            System.out.println(Thread.currentThread().getName() + &quot;进行count--&quot;);
+            count--;
+        }
+
+        /**
+         * 锁住当前方法
+         * increase() == synIncrease()
+         */
+        public synchronized void synIncrease() {
+            System.out.println(Thread.currentThread().getName() + &quot;进行count++&quot;);
+            count++;
+        }
+    }
+}
+</code></pre>
+<p>运行结果如图所示:</p>
+<figure data-type="image" tabindex="3"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210519144243.png" alt="截图_选择区域_20210519144243" loading="lazy"></figure>
+<blockquote>
+<p>为什么会出现一会thread-a操作一会thread-b操作,count还等于-5?不是已经通过synchronized (this)锁住了代码块,保证count的加减操作都是原子性的吗?</p>
+<p>解答:</p>
+<p>问题1:先是thread-a然后thread-b操作</p>
+<p>答:因为系统调度线程是随机的,所以出现了线程A和线程B交替执行的情况.synchronized只保证代码块的内容会依次从上至下顺序执行,不保证线程按顺序调度.</p>
+<p>问题2:count==-5?</p>
+<p>答:虽然通过synchronized保证了Counter的加减操作是原子性的,但是整个main方法不是原子性操作,其中存在三个线程thread-a/b和main线程.而最后输出时,main线程获取到Counter的count值,此时并不能保证thread-a/b已经执行完,所以取到的count值并不等于0.为了获取到正确的值,其实很简单,等待thread-a/b直接完成就可以了:在输出语句前加上<code>threadA.join();threadB.join();</code>,就能取得正确count值.</p>
+<figure data-type="image" tabindex="4"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210519145858.png" alt="截图_选择区域_20210519145858" loading="lazy"></figure>
+</blockquote>
+<p><em>注意事项</em>:</p>
+<ul>
+<li>当使用<code>synchronized</code>修饰方法时,等价于方法体内使用<code>synchronized(this){//所有代码}</code>写法,但是静态方法中是不存在<code>this</code>对象的,所以在静态方法中等价于方法体内使用<code>synchronized(Class.class){//所有代码}</code>的写法.</li>
+<li>所有方法默认不使用<code>synchronized</code>修饰,所有变量默认不使用<code>volatile</code>修饰,即:除了特殊说明外,一般的类默认是线程不安全的.</li>
+</ul>
+<h4 id="线程封闭">线程封闭</h4>
+<p>由上面的两个例子可以看出,因为操作共享变量带来了诸多问题,才引入关键字来保证多线程能够正确的读写共享变量.既然如此,为了保证线程安全,各个线程不读写共享变量,只在自己的线程中读写自己的变量(<code>局部变量</code>),那就没有干扰了:这种方式称为<code>线程封闭</code>.</p>
+<pre><code class="language-java">public class ClosedThreadLearn {
+
+    public int countNumber(){
+        int count = 0;
+
+        for (int i = 0; i &lt; 10; i++) {
+            count++;//非原子操作,但只对局部变量count有影响,count在方法体外不起作用
+        }
+        for (int i = 0; i &lt; 10; i++) {
+            count--;
+        }
+        return count;
+    }
+
+    public static void main(String[] args){
+        ClosedThreadLearn closedThreadLearn = new ClosedThreadLearn();
+        Thread threadA = new Thread(() -&gt; {
+            int count = closedThreadLearn.countNumber();
+            System.out.println(Thread.currentThread().getName()+&quot; count = &quot;+count);
+        }, &quot;closed-thread-a&quot;);
+        Thread threadB = new Thread(() -&gt; {
+            int count = closedThreadLearn.countNumber();
+            System.out.println(Thread.currentThread().getName()+&quot; count = &quot;+count);
+        }, &quot;closed-thread-b&quot;);
+        threadA.start();
+        threadB.start();
+        //输出结果:
+        //closed-thread-b count = 0
+        //closed-thread-a count = 0
+    }
+}
+</code></pre>
+<h4 id="不可变性">不可变性</h4>
+<p>除了使用局部变量的方式,我们还可以使用<code>final</code>关键字来修饰共享变量,来保证该变量是<code>不可变</code>变量.</p>
+<pre><code class="language-java">public final class ImmutableVariableLearn {//被final修饰的类不可被继承
+
+    private final int count = 100;//被final修饰的变量必须被初始化,不被能修改
+    private final List&lt;Integer&gt; list;//虽然list对象不能被重新赋值(执行新的引用),但是不能避免list对象内部的值发生变化
+
+    public ImmutableVariableLearn(List&lt;Integer&gt; list) {
+        this.list = list;
+    }
+
+    public final int countNumber() {//被final修饰的方法不可被重写
+        //count++; Cannot assign a value to final variable 'count'
+        return count;
+    }
+
+    public final List&lt;Integer&gt; addElement(){
+        list.add(count);//虽然被final修饰,仍然可以add元素
+        return list;
+    }
+
+    public static void main(String[] args){
+        ImmutableVariableLearn immutableVariableLearn = new ImmutableVariableLearn(new ArrayList&lt;&gt;());
+        Thread threadA = new Thread(() -&gt; {
+            int count = immutableVariableLearn.count;
+            System.out.println(Thread.currentThread().getName() + &quot; count:&quot; + count);
+            for (Integer integer : immutableVariableLearn.addElement()) {
+                System.out.println(Thread.currentThread().getName()+&quot; list element:&quot;+integer);
+            }
+        }, &quot;immutableVary-thread-a&quot;);
+
+        Thread threadB = new Thread(() -&gt; {
+            int count = immutableVariableLearn.count;
+            System.out.println(Thread.currentThread().getName() + &quot; count:&quot; + count);
+            for (Integer integer : immutableVariableLearn.addElement()) {
+                System.out.println(Thread.currentThread().getName()+&quot; list element:&quot;+integer);
+            }
+        }, &quot;immutableVary-thread-b&quot;);
+        threadA.start();
+        threadB.start();
+    }
+}
+</code></pre>
+<p>结果如图所示:</p>
+<figure data-type="image" tabindex="5"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210519170357.png" alt="截图_选择区域_20210519170357" loading="lazy"></figure>
+<blockquote>
+<p>为什么被final修饰的addElement()方法会出现两个thread-a list element(100),而且thread-b会抛出异常?</p>
+<p>问题1:遍历addElement(),返回了2个thread-a list element(100)</p>
+<p>答:final修饰方法既不能保证addElement()方法具有原子性,也不会为方法上锁,而addElement中调用了list.add()方法,list属于ArrayList,它不是线程安全的类,add()方法线程不安全.</p>
+<p>所以当thread-b为list新增了一个元素后,thread-a又为list新增了一个元素,所以在thread-a中遍历出现了2个element(100),但thread-b第一次新增元素还来得及执行输出语句时,就已经检测到异常并抛出了</p>
+<p>问题2:thread-b抛出异常</p>
+<p>答:在使用foreach遍历list时,java语法糖隐式调用了Iterator迭代器,使用Iterator.hasNext()和Iterator.next()进行遍历.查看ArrayList中Iterator.next()实现,modCount != expectedModCount时会抛出该异常.由于thread-b读取到的expectedModCount=1,而thread-a又对集合添加了元素,modCount=2,所以导致modCount!=expectedModCount,抛出异常.</p>
+<pre><code>public E next() {
+ checkForComodification();
+ int i = cursor;
+ if (i &gt;= size)
+ throw new NoSuchElementException();
+ Object[] elementData = ArrayList.this.elementData;
+ if (i &gt;= elementData.length)
+ throw new ConcurrentModificationException();
+ cursor = i + 1;
+ return (E) elementData[lastRet = i];
+}
+     
+final void checkForComodification() {
+ if (modCount != expectedModCount)
+     throw new ConcurrentModificationException();
+}
+</code></pre>
+<p>字节码文件中,foreach隐式调用Iterator迭代器模式进行遍历:</p>
+<figure data-type="image" tabindex="6"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210519164154.png" alt="截图_选择区域_20210519164154" loading="lazy"></figure>
+</blockquote>
+<p>正确的做法应该是:当使用final修饰变量时,使用线程安全的类.</p>
+<pre><code class="language-java">public final class ImmutableVariableLearn {//被final修饰的类不可被继承
+
+    private final int count = 100;//被final修饰的变量必须被初始化,不被能修改
+    private final CopyOnWriteArrayList&lt;Integer&gt; list;//虽然list对象不能被重新赋值(执行新的引用),但是不能避免list对象内部的值发生变化
+
+    public ImmutableVariableLearn(CopyOnWriteArrayList&lt;Integer&gt; list) {
+        this.list = list;
+    }
+
+    public final int countNumber() {//被final修饰的方法不可被重写
+        //count++; Cannot assign a value to final variable 'count'
+        return count;
+    }
+
+    public final List&lt;Integer&gt; addElement(){
+        list.add(count);//虽然被final修饰,仍然可以add元素
+        return list;
+    }
+
+    public static void main(String[] args){
+        ImmutableVariableLearn immutableVariableLearn = new ImmutableVariableLearn(new CopyOnWriteArrayList&lt;&gt;());
+        Thread threadA = new Thread(() -&gt; {
+            int count = immutableVariableLearn.count;
+            System.out.println(Thread.currentThread().getName() + &quot; count:&quot; + count);
+            for (Integer integer : immutableVariableLearn.addElement()) {
+                System.out.println(Thread.currentThread().getName()+&quot; list element:&quot;+integer);
+            }
+        }, &quot;immutableVary-thread-a&quot;);
+
+        Thread threadB = new Thread(() -&gt; {
+            int count = immutableVariableLearn.count;
+            System.out.println(Thread.currentThread().getName() + &quot; count:&quot; + count);
+            for (Integer integer : immutableVariableLearn.addElement()) {
+                System.out.println(Thread.currentThread().getName()+&quot; list element:&quot;+integer);
+            }
+        }, &quot;immutableVary-thread-b&quot;);
+        threadA.start();
+        threadB.start();
+    }
+}
+</code></pre>
+<p>结果如图所示,没有异常抛出.</p>
+<figure data-type="image" tabindex="7"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210519170812.png" alt="截图_选择区域_20210519170812" loading="lazy"></figure>
+<blockquote>
+<p>不可变性是函数式编程的重要思想和基石.<em>共享变量就不可变,可变变量就不共享</em>.</p>
+<p>想要改变一个不可变对象时,利用修改后的值,创建一个新的对象并指向它.(参见java.lang.String)</p>
+</blockquote>
+<h4 id="死锁">死锁</h4>
+<p>死锁：两个或两个以上的线程交叉执行,互相持有对方的锁并一直不释放,造成永久等待.</p>
+<pre><code class="language-java">/**
+ * 死锁条件:
+ * 1.多个线程交替执行
+ * 2.相互持有锁且不释放.永久等待
+ */
+public class DeadLock {
+
+    private  final Object lockA = new Object();
+    private  final Object lockB = new Object();
+    private  int sum = 0;
+    
+    public int increase(int num) throws InterruptedException {
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+        synchronized (lockA){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+            Thread.sleep(1000);
+            System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+            synchronized (lockB){
+                System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+                sum+=num;
+                Thread.sleep(1000);
+            }
+            System.out.println(Thread.currentThread().getName()+&quot;:释放lock b&quot;);
+        }
+        System.out.println(Thread.currentThread().getName()+&quot;:释放lock a&quot;);
+        return sum;
+    }
+    
+    public int decrease(int num) throws InterruptedException {
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+        synchronized (lockB){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+            Thread.sleep(1000);
+            System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+            synchronized (lockA){
+                System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+                sum-=num;
+                Thread.sleep(1000);
+            }
+            System.out.println(Thread.currentThread().getName()+&quot;:释放lock a&quot;);
+        }
+        System.out.println(Thread.currentThread().getName()+&quot;:释放lock b&quot;);
+        return sum;
+    }
+    
+    public static void main(String[] args){
+        DeadLock deadLock = new DeadLock();
+        Thread threadA = new Thread(() -&gt; {
+            int sum = 0;
+            try {
+                sum = deadLock.increase(5);
+                System.out.println(Thread.currentThread().getName() + &quot; 增加后的sum=&quot; + sum);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, &quot;dead-thread-a&quot;);
+
+        Thread threadB = new Thread(() -&gt; {
+            int sum = 0;
+            try {
+                sum = deadLock.decrease(5);
+                System.out.println(Thread.currentThread().getName() + &quot; 减少后的sum=&quot; + sum);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, &quot;dead-thread-b&quot;);
+
+        threadA.start();
+        threadB.start();
+    }
+}
+</code></pre>
+<p>结果如图所示:</p>
+<figure data-type="image" tabindex="8"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210520111457.png" alt="截图_选择区域_20210520111457" loading="lazy"></figure>
+<p>在thread-a/b执行到试图获取lock b/a时,就开始一直等待,形成了死锁.此时,只能通过结束进程来释放资源.</p>
+<h5 id="避免死锁">避免死锁</h5>
+<ol>
+<li>固定加锁顺序 (针对<code>互相持有</code>)</li>
+<li>开放调用(细化锁力度,减少锁面积)</li>
+<li>使用定时锁(针对<code>一直等待</code>)</li>
+</ol>
+<pre><code class="language-java">/**
+ * 1.固定加锁顺序
+ * 仍然是这两个操作,只不过调整了increase和decrease都是先获取lockA,然后获取lockB,接着释放lockB,最后释放lockA
+ */
+public int increased(int num) throws InterruptedException {
+    System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+    synchronized (lockA){
+        System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+        Thread.sleep(1000);
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+        synchronized (lockB){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+            sum+=num;
+            Thread.sleep(1000);
+        }
+        System.out.println(Thread.currentThread().getName()+&quot;:释放lock b&quot;);
+    }
+    System.out.println(Thread.currentThread().getName()+&quot;:释放lock a&quot;);
+    return sum;
+}
+
+public int decrease(int num) throws InterruptedException {
+    System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+    synchronized (lockA){
+        System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+        Thread.sleep(1000);
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+        synchronized (lockB){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+            sum-=num;
+            Thread.sleep(1000);
+        }
+        System.out.println(Thread.currentThread().getName()+&quot;:释放lock b&quot;);
+    }
+    System.out.println(Thread.currentThread().getName()+&quot;:释放lock a&quot;);
+    return sum;
+}
+</code></pre>
+<p>结果如图所示:</p>
+<figure data-type="image" tabindex="9"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210520134610.png" alt="截图_选择区域_20210520134610" loading="lazy"></figure>
+<pre><code class="language-java">/**
+ * 使用定时锁
+ * 仍然是这两个操作
+ * 同样是先某线程在increase中先获取lock a,再获取lock b,另一个线程在decrease中先获取lock b, 再获取lock a
+ * 区别在于我们不再无限获取锁,如果等待时间内还是获取不到另一把锁,我们放弃获取另一把锁
+ */
+public int increase(int num) throws InterruptedException {
+    System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+    if (lockA.tryLock(5, TimeUnit.SECONDS)){
+        System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+        Thread.sleep(1000);
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+        if(lockB.tryLock(3, TimeUnit.SECONDS)){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+            sum+=num;
+            Thread.sleep(1000);
+        }else{
+            System.out.println(Thread.currentThread().getName()+&quot;:放弃获取lock b&quot;);
+        }
+    }else{
+        System.out.println(Thread.currentThread().getName()+&quot;:放弃获取lock a&quot;);
+    }
+    return sum;
+}
+
+public int decrease(int num) throws InterruptedException {
+    System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock b&quot;);
+    if(lockB.tryLock(5, TimeUnit.SECONDS)){
+        System.out.println(Thread.currentThread().getName()+&quot;:获取到lock b&quot;);
+        Thread.sleep(1000);
+        System.out.println(Thread.currentThread().getName()+&quot;:试图获取lock a&quot;);
+        if(lockA.tryLock(5, TimeUnit.SECONDS)){
+            System.out.println(Thread.currentThread().getName()+&quot;:获取到lock a&quot;);
+            sum-=num;
+            Thread.sleep(1000);
+        }else{
+            System.out.println(Thread.currentThread().getName()+&quot;:放弃获取lock a&quot;);
+        }
+    }else {
+        System.out.println(Thread.currentThread().getName()+&quot;:放弃获取lock b&quot;);
+    }
+    return sum;
+}
+</code></pre>
+<p>结果如图所示:</p>
+<figure data-type="image" tabindex="10"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210520142850.png" alt="截图_选择区域_20210520142850" loading="lazy"></figure>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8Bjmm">Java内存模型(JMM)</a></li>
+<li><a href="#%E5%86%85%E5%AD%98%E7%9A%84%E4%BA%A4%E4%BA%92%E6%93%8D%E4%BD%9C">内存的交互操作</a>
+<ul>
+<li><a href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">注意事项</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%AF%E8%A7%81%E6%80%A7">可见性</a></li>
+<li><a href="#%E5%8E%9F%E5%AD%90%E6%80%A7">原子性</a></li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E5%B0%81%E9%97%AD">线程封闭</a></li>
+<li><a href="#%E4%B8%8D%E5%8F%AF%E5%8F%98%E6%80%A7">不可变性</a></li>
+<li><a href="#%E6%AD%BB%E9%94%81">死锁</a>
+<ul>
+<li><a href="#%E9%81%BF%E5%85%8D%E6%AD%BB%E9%94%81">避免死锁</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-ji-chu-jie-shao/">
+              <h3 class="post-title">
+                Java基础篇 - 多线程 - 基础介绍
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

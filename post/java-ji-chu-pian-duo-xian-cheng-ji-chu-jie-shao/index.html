@@ -1,0 +1,510 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 多线程 - 基础介绍 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1621492657612">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 基础介绍 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="1.线程是什么
+进程:一个运行中的应用程序,如(一个浏览器,一个QQ,一个java程序).
+线程:一个应用程序的子任务,如(浏览器:浏览页面,刷新页面,另开标签页,播放视频/音乐).
+可以从介绍中得出结论:
+
+可以同时存在多个进程,一个进程..." />
+    <meta name="keywords" content="多线程,java" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1621492657612" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 多线程 - 基础介绍
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-05-18
+              </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/UQVDT19g1/" class="post-tag">
+                  # 多线程
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="1线程是什么">1.线程是什么</h4>
+<p>进程:一个运行中的应用程序,如(一个浏览器,一个QQ,一个java程序).</p>
+<p>线程:一个应用程序的子任务,如(浏览器:浏览页面,刷新页面,另开标签页,播放视频/音乐).</p>
+<p>可以从介绍中得出结论:</p>
+<ol>
+<li>可以同时存在多个进程,一个进程中包含至少一个线程,可以包含多个线程.</li>
+<li>应用程序的单位是进程(浏览器),即操作系统资源分配最小单位是进程.</li>
+<li>执行任务的单位是线程(浏览页面),即操作系统任务调度最小单位是线程.</li>
+</ol>
+<h4 id="2线程与进程的区别">2.线程与进程的区别</h4>
+<p>进程:</p>
+<ol>
+<li>操作系统为每个进程分配了独立的内存空间和系统资源.</li>
+<li>在进行多进程间切换时,会消耗大量的时间和空间(进程的创建、撤消和切换).</li>
+<li>在进行多进程间通信时,相对于线程而言较慢.</li>
+<li>在进程崩溃时,不会影响到其他的进程.(QQ崩溃了不妨碍看网页)</li>
+</ol>
+<p>线程:</p>
+<ol>
+<li>线程属于进程,是任务的执行单位.属于一个进程的多线程,在系统给进程分配的同一块内存空间中工作,资源共享.</li>
+<li>在进行多线程间切换时,因为共享同一块系统资源(内存空间和数据),所以切换时消耗的时间和空间较少.</li>
+<li>在进行多线程间通信时,因为资源共享,所以相对于进程更快.</li>
+<li>在线程崩溃时,进程也会崩溃.(QQ发起多人视频时卡死,QQ崩溃)</li>
+</ol>
+<h4 id="3为什么要使用多线程">3.为什么要使用多线程</h4>
+<p>我们可以从上面的结论看到,一个进程起码分配了一个线程,操作系统由线程执行任务.</p>
+<p>当我们使用单线程执行任务时,也就是让一个进程只使用一个线程执行任务:一个CPU同时运行一个浏览器,一个QQ,一个java程序.由于CPU运行速度非常快，会让人产生CPU在同时执行浏览器、QQ、Java程序的错觉.其实是一个CPU在某一个时刻,只能运行一个任务.</p>
+<blockquote>
+<p>计算机组件运行时间对比:</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/image-20210517160458592.png" alt="image-20210517160458592" loading="lazy"></figure>
+</blockquote>
+<p>为了能使得进程(QQ)能有更多的任务在CPU中执行,我们就需要创建多个线程来增加抢占CPU执行权的概率,让CPU更多的执行该进程(QQ)的任务.</p>
+<p><strong>本质上讲:使用多线程就是为了提高利用系统资源率,抢占CPU执行权</strong>.</p>
+<h4 id="4并发与并行">4.并发与并行</h4>
+<p>并发:1个CPU在<strong>某一段时间</strong>执行<strong>多个</strong>任务.</p>
+<p>并行:多个CPU在<strong>某一刻时间</strong>执行<strong>多个</strong>任务.</p>
+<h4 id="5线程的使用">5.线程的使用</h4>
+<h5 id="创建线程">创建线程</h5>
+<pre><code class="language-java">/**
+ * JDK中Thread类的注释:
+ * java.lang public class Thread extends Object implements Runnable
+ * 线程是程序中的执行线程。 Java虚拟机允许应用程序具有多个并发运行的执行线程。
+ * 每个线程都有一个优先级。 具有较高优先级的线程优先于具有较低优先级的线程执行。
+ * 每个线程可能会也可能不会被标记为守护程序。 当在某个线程中运行的代码创建新的Thread对象时，新线程的优先级最初设置为与创建线程的优先级相等，
+ * 并且当且仅当创建线程是守护程序时，该线程才是守护程序线程。
+ * Java虚拟机启动时，通常只有一个非守护程序线程（通常调用某些指定类的名为main的方法）。 Java虚拟机将继续执行线程，直到发生以下任何一种情况：
+ * 调用了Runtime类的exit方法，并且安全管理器允许进行退出操作。
+ * 不是守护程序线程的所有线程都已死，要么通过从调用返回到run方法，要么抛出异常传播到run方法之外
+ */
+public class MyThread {
+
+    public static void main(String[] args){
+        //使用start()方法唤起新线程
+        createThread().start();//输出:我是继承Thread线程
+        createThread2().start();//输出:我是实现Runnable线程
+        createThread3().start();//我是匿名内部类实现的Runnable线程
+    	//run()方法仅仅只是一个普通类的方法调用,并不会创建新线程
+    }
+
+    /**
+     * 三种创建线程的方式:
+     * 其一:继承Thread类
+     * @return
+     */
+    private static Thread createThread() {
+        Thread thread = new Thread1();
+        thread.setPriority(1);
+        return thread;
+    }
+    
+    /**
+     * 继承Thread类,重写run方法
+     */
+    private static class Thread1 extends Thread{
+        @Override
+        public void run() {
+            System.out.println(&quot;我是继承Thread线程&quot;);;
+        }
+    }
+
+    /**
+     * 三种创建线程的方式:
+     * 其二:实现Runnable接口, 使用Thread(Runnable target)构造方法创建Thread对象
+     * @return
+     */
+    private static Thread createThread2() {
+        Thread thread = new Thread(new Thread2());
+        thread.setPriority(2);
+        return thread;
+    }
+
+    /**
+     * 实现Runnable接口,重写run方法
+     */
+    private static class Thread2 implements Runnable {
+        @Override
+        public void run() {
+            System.out.println(&quot;我是实现Runnable线程&quot;);;
+        }
+    }
+    
+    /**
+     * 三种创建线程的方式:
+     * 其三:使用Thread(Runnable target)构造方法,利用匿名内部类实现Runnable接口,重写run方法
+     * @return
+     */
+    private static Thread createThread3() {
+        Thread thread = new Thread(() -&gt; System.out.println(&quot;我是匿名内部类实现的Runnable线程&quot;));
+        thread.setPriority(3);
+        return thread;
+    }
+
+}
+</code></pre>
+<p>输出结果:</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/image-20210517165629377.png" alt="image-20210517165629377" loading="lazy"></figure>
+<p>结论:并不是较高优先级的线程一定会优先于具有较低优先级的线程执行,只是增加了执行概率.</p>
+<h5 id="线程状态">线程状态</h5>
+<p><code>java.lang.Thread</code>中<code>State</code>定义了六种状态:</p>
+<pre><code class="language-java">/**
+ * 线程状态。 线程可以处于以下状态之一：
+ * NEW 尚未启动的线程处于此状态。
+ * RUNNABLE 在Java虚拟机中执行的线程处于这种状态。
+ * BLOCKED 在等待监视器锁定的情况下被阻塞的线程处于此状态。
+ * WAITING 无限期地等待另一个线程执行特定操作的线程处于此状态。
+ * TIMED_WAITING 正在等待另一个线程执行操作的线程最多达到指定的等待时间，该线程处于此状态。
+ * TERMINATED 退出的线程处于此状态。
+ * 在给定的时间点，线程只能处于一种状态。 这些状态是虚拟机状态，不反映任何操作系统线程状态
+ */
+public enum State {
+        /**
+         * Thread state for a thread which has not yet started.
+         */
+        NEW,
+
+        /**
+         * Thread state for a runnable thread.  A thread in the runnable
+         * state is executing in the Java virtual machine but it may
+         * be waiting for other resources from the operating system
+         * such as processor.
+         */
+        RUNNABLE,
+
+        /**
+         * Thread state for a thread blocked waiting for a monitor lock.
+         * A thread in the blocked state is waiting for a monitor lock
+         * to enter a synchronized block/method or
+         * reenter a synchronized block/method after calling
+         * {@link Object#wait() Object.wait}.
+         */
+        BLOCKED,
+
+        /**
+         * Thread state for a waiting thread.
+         * A thread is in the waiting state due to calling one of the
+         * following methods:
+         * &lt;ul&gt;
+         *   &lt;li&gt;{@link Object#wait() Object.wait} with no timeout&lt;/li&gt;
+         *   &lt;li&gt;{@link #join() Thread.join} with no timeout&lt;/li&gt;
+         *   &lt;li&gt;{@link LockSupport#park() LockSupport.park}&lt;/li&gt;
+         * &lt;/ul&gt;
+         *
+         * &lt;p&gt;A thread in the waiting state is waiting for another thread to
+         * perform a particular action.
+         *
+         * For example, a thread that has called {@code Object.wait()}
+         * on an object is waiting for another thread to call
+         * {@code Object.notify()} or {@code Object.notifyAll()} on
+         * that object. A thread that has called {@code Thread.join()}
+         * is waiting for a specified thread to terminate.
+         */
+        WAITING,
+
+        /**
+         * Thread state for a waiting thread with a specified waiting time.
+         * A thread is in the timed waiting state due to calling one of
+         * the following methods with a specified positive waiting time:
+         * &lt;ul&gt;
+         *   &lt;li&gt;{@link #sleep Thread.sleep}&lt;/li&gt;
+         *   &lt;li&gt;{@link Object#wait(long) Object.wait} with timeout&lt;/li&gt;
+         *   &lt;li&gt;{@link #join(long) Thread.join} with timeout&lt;/li&gt;
+         *   &lt;li&gt;{@link LockSupport#parkNanos LockSupport.parkNanos}&lt;/li&gt;
+         *   &lt;li&gt;{@link LockSupport#parkUntil LockSupport.parkUntil}&lt;/li&gt;
+         * &lt;/ul&gt;
+         */
+        TIMED_WAITING,
+
+        /**
+         * Thread state for a terminated thread.
+         * The thread has completed execution.
+         */
+        TERMINATED;
+    }
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="http://img.zhengjianru.work/20190314085808279.png" alt="image-20210517170432312" loading="lazy"></figure>
+<pre><code class="language-java">private static void threadState() {
+    Object lock = new Object();
+
+    //Thread.state.NEW
+    Thread thread = new Thread(()-&gt;{
+        synchronized (lock){//Thread.state.BLOCKED
+            Thread currentThread = Thread.currentThread();
+            try {
+                lock.wait();//Thread.state.WAITING
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(&quot;这是第一个线程:&quot;+currentThread.getName());
+        }
+    },&quot;block-thread-1&quot;);
+    Thread thread2 = new Thread(()-&gt;{
+        synchronized (lock){//Thread.state.BLOCKED
+            try {
+                Thread.sleep(500);//Thread.state.TIMED_WAITING
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println(&quot;这是第二个线程:&quot;+Thread.currentThread().getName());
+        }
+    },&quot;block-thread-2&quot;);
+
+    //Thread.state.RUNNABLE
+    thread.start();
+    thread2.start();
+
+    //Thread.state.TERMINATED
+    System.out.println(thread.getState());
+    System.out.println(thread2.getState());
+}
+</code></pre>
+<h5 id="中断线程">中断线程</h5>
+<pre><code class="language-java">/**
+ * 中断此线程。
+ * 除非始终允许当前线程中断自身，否则将一直调用此线程的checkAccess方法，这可能导致引发SecurityException 。
+ * 如果在调用Object类的wait() ， wait(long)或wait(long, int)方法或join() ， join(long) ， join(long, int)方法时阻塞了该线程， sleep(long)或sleep(long, int)此类的方法，则其中断状态将被清除，并将收到InterruptedException 。
+ * 如果此线程在InterruptibleChannel的I / O操作中被阻止，则该通道将被关闭，该线程的中断状态将被设置，并且该线程将收到java.nio.channels.ClosedByInterruptException 。
+ * 如果此线程在java.nio.channels.Selector被阻塞，则将设置该线程的中断状态，并且它将立即从选择操作中返回（可能具有非零值），就像调用选择器的wakeup方法一样。
+ * 如果上述条件均不成立，则将设置该线程的中断状态。
+ * 中断未运行的线程不会产生任何效果。
+ */
+private static void interruptThread() throws InterruptedException {
+    Thread thread = new Thread(() -&gt; {//thread-&gt;Thread.state.NEW
+        int n = 0;
+        try {
+            Thread.sleep(10);//thread-&gt;Thread.state.TIMED_WAITING
+            while (!Thread.interrupted()) {//非中断状态,计数并输出
+                System.out.printf(&quot;第%s次打印:hello thread%n&quot;, ++n);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }, &quot;interrupt-thread-a&quot;);
+    thread.start();//thread-&gt;Thread.state.RUNNABLE
+    Thread.sleep(50);//mainThread-&gt;Thread.state.TIMED_WAITING
+    thread.interrupt();//中断thread
+    thread.join();//thread-&gt;Thread.state.WAITING
+    System.out.println(thread.getState());//thread-&gt;Thread.state.TERMINATED
+}
+</code></pre>
+<h5 id="守护线程">守护线程</h5>
+<pre><code class="language-java">/**
+ * 将此线程标记为守护程序线程或用户线程。 
+ * 当所有正在运行的线程都是守护程序线程时，Java虚拟机将退出。
+ * 必须在线程启动之前调用此方法
+ */
+private static Thread daemonThread() {
+    Thread thread = new Thread(() -&gt; {
+        while(true){
+            System.out.println(LocalTime.now());
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }, &quot;daemon-thread-a&quot;);
+    thread.setDaemon(true);//将thread标记为守护线程
+    thread.start();
+    return thread;
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#1%E7%BA%BF%E7%A8%8B%E6%98%AF%E4%BB%80%E4%B9%88">1.线程是什么</a></li>
+<li><a href="#2%E7%BA%BF%E7%A8%8B%E4%B8%8E%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB">2.线程与进程的区别</a></li>
+<li><a href="#3%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E5%A4%9A%E7%BA%BF%E7%A8%8B">3.为什么要使用多线程</a></li>
+<li><a href="#4%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%B9%B6%E8%A1%8C">4.并发与并行</a></li>
+<li><a href="#5%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%BD%BF%E7%94%A8">5.线程的使用</a>
+<ul>
+<li><a href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B">创建线程</a></li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E7%8A%B6%E6%80%81">线程状态</a></li>
+<li><a href="#%E4%B8%AD%E6%96%AD%E7%BA%BF%E7%A8%8B">中断线程</a></li>
+<li><a href="#%E5%AE%88%E6%8A%A4%E7%BA%BF%E7%A8%8B">守护线程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-fan-xing/">
+              <h3 class="post-title">
+                Java基础篇 - 泛型
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
