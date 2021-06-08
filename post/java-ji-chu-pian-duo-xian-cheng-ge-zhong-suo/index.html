@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Java基础篇 - 多线程 - 各种锁 | Huffman&#39;s Study Area</title>
-<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623131658866">
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623138958334">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 各种锁 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
@@ -11,10 +11,9 @@
 
 
 
-    <meta name="description" content="
-参考资料:https://tech.meituan.com/2018/11/15/java-lock.html
+    <meta name="description" content="上篇多线程-进阶-原子性中,介绍了synchronized关键字.指出synchronized是一种互斥锁、内置锁还是可重入锁.那么这些锁是什么意思呢?还有其他锁吗,分别是什么作用,用在什么场景下呢?这一篇我们详细介绍一下各种锁.
 
-上篇多线程-进阶-原子性中,介绍了synchronized关键字.指出synchronized是一种互斥锁、内置锁还是可重入..." />
+1.悲..." />
     <meta name="keywords" content="锁,多线程,java" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -24,7 +23,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://nojudgeme.github.io">
-  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623131658866" alt="">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623138958334" alt="">
   </a>
   <h1 class="site-title">
     Huffman&#39;s Study Area
@@ -103,10 +102,7 @@
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <blockquote>
-<p>参考资料:https://tech.meituan.com/2018/11/15/java-lock.html</p>
-</blockquote>
-<p>上篇多线程-进阶-原子性中,介绍了<code>synchronized</code>关键字.指出<code>synchronized</code>是一种<code>互斥锁、内置锁</code>还是<code>可重入锁</code>.那么这些锁是什么意思呢?还有其他锁吗,分别是什么作用,用在什么场景下呢?这一篇我们详细介绍一下各种锁.</p>
+                <p>上篇多线程-进阶-原子性中,介绍了<code>synchronized</code>关键字.指出<code>synchronized</code>是一种<code>互斥锁、内置锁</code>还是<code>可重入锁</code>.那么这些锁是什么意思呢?还有其他锁吗,分别是什么作用,用在什么场景下呢?这一篇我们详细介绍一下各种锁.</p>
 <figure data-type="image" tabindex="1"><img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png" alt="" loading="lazy"></figure>
 <h4 id="1悲观锁与乐观锁">1.悲观锁与乐观锁</h4>
 <p>悲观锁:在某一线程操作数据时,总是认为会有其他线程来篡改数据,为了避免这种情况,该线程总是先上锁后再操作数据,确保其他线程不能修改该数据.</p>
@@ -368,6 +364,9 @@ public final class Unsafe {
 <p>指锁能多个线程占有.如<code>java.utils.concurrent.locks.ReentrantReadWriteLock</code>中<code>ReentrantReadWriteLock.ReadLock</code>是共享锁,而<code>ReentrantReadWriteLock.WriteLock</code>是独享锁.</p>
 <p><code>ReadLock</code>读锁共享,即可以使线程高效的并发读.</p>
 <p><code>WriteLock</code>写锁独享,即可以使线程安全的操作共享变量.</p>
+<blockquote>
+<p>参考资料:https://tech.meituan.com/2018/11/15/java-lock.html</p>
+</blockquote>
 
               </div>
               <div class="toc-container">

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-06-08T07:40:06.897Z</updated>
+    <updated>2021-06-08T08:00:24.612Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -16,10 +16,7 @@
         <link href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-xian-cheng-chi/">
         </link>
         <updated>2021-06-08T05:49:12.000Z</updated>
-        <content type="html"><![CDATA[<blockquote>
-<p>参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</p>
-</blockquote>
-<h4 id="线程池是什么">线程池是什么</h4>
+        <content type="html"><![CDATA[<h4 id="线程池是什么">线程池是什么</h4>
 <p>线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.</p>
 <h4 id="为什么使用线程池">为什么使用线程池</h4>
 <p>线程池解决的核心问题就是线程资源管理的问题.在并发环境中,系统不能确定会有多少任务需要线程执行.那么他们造成的问题在于</p>
@@ -330,6 +327,9 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
     }
 }
 </code></pre>
+<blockquote>
+<p>参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</p>
+</blockquote>
 ]]></content>
     </entry>
     <entry>
@@ -338,10 +338,7 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
         <link href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-ge-zhong-suo/">
         </link>
         <updated>2021-06-01T08:08:26.000Z</updated>
-        <content type="html"><![CDATA[<blockquote>
-<p>参考资料:https://tech.meituan.com/2018/11/15/java-lock.html</p>
-</blockquote>
-<p>上篇多线程-进阶-原子性中,介绍了<code>synchronized</code>关键字.指出<code>synchronized</code>是一种<code>互斥锁、内置锁</code>还是<code>可重入锁</code>.那么这些锁是什么意思呢?还有其他锁吗,分别是什么作用,用在什么场景下呢?这一篇我们详细介绍一下各种锁.</p>
+        <content type="html"><![CDATA[<p>上篇多线程-进阶-原子性中,介绍了<code>synchronized</code>关键字.指出<code>synchronized</code>是一种<code>互斥锁、内置锁</code>还是<code>可重入锁</code>.那么这些锁是什么意思呢?还有其他锁吗,分别是什么作用,用在什么场景下呢?这一篇我们详细介绍一下各种锁.</p>
 <figure data-type="image" tabindex="1"><img src="https://awps-assets.meituan.net/mit-x/blog-images-bundle-2018b/7f749fc8.png" alt="" loading="lazy"></figure>
 <h4 id="1悲观锁与乐观锁">1.悲观锁与乐观锁</h4>
 <p>悲观锁:在某一线程操作数据时,总是认为会有其他线程来篡改数据,为了避免这种情况,该线程总是先上锁后再操作数据,确保其他线程不能修改该数据.</p>
@@ -603,6 +600,9 @@ public final class Unsafe {
 <p>指锁能多个线程占有.如<code>java.utils.concurrent.locks.ReentrantReadWriteLock</code>中<code>ReentrantReadWriteLock.ReadLock</code>是共享锁,而<code>ReentrantReadWriteLock.WriteLock</code>是独享锁.</p>
 <p><code>ReadLock</code>读锁共享,即可以使线程高效的并发读.</p>
 <p><code>WriteLock</code>写锁独享,即可以使线程安全的操作共享变量.</p>
+<blockquote>
+<p>参考资料:https://tech.meituan.com/2018/11/15/java-lock.html</p>
+</blockquote>
 ]]></content>
     </entry>
     <entry>
