@@ -1,0 +1,553 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623131509570">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="线程池是什么
+线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.
+为什么使用线程池
+线程池解决的核心问题就是线程资源管理的问题.在..." />
+    <meta name="keywords" content="线程池,多线程,java" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623131509570" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 多线程 - 线程池
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-06-08
+              </span>
+              <span>
+                13 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/zlHt5cL4Y/" class="post-tag">
+                  # 线程池
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/UQVDT19g1/" class="post-tag">
+                  # 多线程
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="线程池是什么">线程池是什么</h4>
+<p>线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.</p>
+<h4 id="为什么使用线程池">为什么使用线程池</h4>
+<p>线程池解决的核心问题就是线程资源管理的问题.在并发环境中,系统不能确定会有多少任务需要线程执行.那么他们造成的问题在于</p>
+<ul>
+<li>频繁创建/销毁线程会造成巨大资源消耗</li>
+<li>无限制任务使用无限制线程执行会将资源消耗殆尽</li>
+<li>系统无法合理分配任务执行线程数,对线程难以管理</li>
+</ul>
+<p>使用线程池解决的问题</p>
+<ul>
+<li>降低资源消耗:通过池化预先创建线程,执行完任务的线程又回到线程池,达到重用的效果</li>
+<li>提高响应速度:预先创建的线程直接执行任务,不再等待创建线程</li>
+<li>提高管理效率:通过配置线程池创建的核心线程数/最大线程数,管理可用线程的数量</li>
+<li>提供拓展能力:线程池具有可拓展性,例如使用SchduledThreadPoolExecutor可以延迟/定期执行任务</li>
+</ul>
+<h4 id="线程池的设计">线程池的设计</h4>
+<p>JDK中,提供了Executor框架来使用线程池.其中Executor提供了一种设计思想:用户无需关心线程的创建流程,也无需关心如何调度线程执行任务.只需要提供Runnable对象,由Executor框架来完成线程调度和执行流程.</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/%E7%BA%BF%E7%A8%8B%E6%B1%A0UML%E7%B1%BB%E5%9B%BE.png" alt="线程池UML类图" loading="lazy"></figure>
+<p>从图上可知,ThreadPoolExecutor起到既管理线程池又管理线程和任务的工作.那么我们来研究一下ThreadPoolExecutor的工作流程:</p>
+<figure data-type="image" tabindex="2"><img src="https://p0.meituan.net/travelcube/77441586f6b312a54264e3fcf5eebe2663494.png" alt="" loading="lazy"></figure>
+<h5 id="工作流程">工作流程</h5>
+<h6 id="任务执行流程">任务执行流程</h6>
+<ol>
+<li><code>ExecutorService threadPool = new ThreadPoolExecutor()</code>初始化线程池</li>
+<li><code>threadPool.submit(task)</code>提交任务,<code>threadPoolExecutor.execute()</code>执行任务</li>
+<li>通过变量<code>ctl</code>获取到当前<code>Running</code>状态下的工作线程数(<code>workerCount</code>)</li>
+<li>通过<code>addWorker()</code>检查线程池状态,如果是关闭状态,采用拒绝策略处理任务,保证线程池处于<code>Running</code>状态</li>
+<li>当工作线程数小于核心线程数时(<code>workerCount&lt;corePoolSize</code>),新增工作线程执行任务</li>
+<li>当工作线程数大于等于核心线程数时(<code>workerCount&gt;=corePoolSize</code>),且任务阻塞队列(<code>workQueue</code>)中任务不满时,添加任务至任务阻塞队列中.</li>
+<li>再次检查<code>ctl</code>,当工作线程数大于等于核心线程数,工作线程数小于最大线程,且任务阻塞队列中任务已满时(<code>corePoolSize&lt;=workerCount&lt;maximumPoolSize &amp;&amp; workerCountOf==0</code>),启动一个线程来执行该任务.</li>
+<li>当工作线程数大于等于最大线程数时且任务阻塞队列已满(<code>workerCount&gt;=maximumPoolSize &amp;&amp; workerCountOf==0</code>),采用拒绝策略处理任务.</li>
+</ol>
+<h6 id="任务缓冲">任务缓冲</h6>
+<p>线程池管理任务的核心模块是通过使用阻塞队列将任务和线程解耦(生产者消费者模式).阻塞队列中存放任务,放入任务的线程充当生产者,取出任务的线程充当消费者.</p>
+<figure data-type="image" tabindex="3"><img src="https://p1.meituan.net/travelcube/f4d89c87acf102b45be8ccf3ed83352a9497.png" alt="" loading="lazy"></figure>
+<p>JDK提供的默认阻塞队列实现:</p>
+<figure data-type="image" tabindex="4"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_jetbrains-idea_20210607095619.png" alt="截图_jetbrains-idea_20210607095619" loading="lazy"></figure>
+<figure data-type="image" tabindex="5"><img src="https://p0.meituan.net/travelcube/725a3db5114d95675f2098c12dc331c3316963.png" alt="" loading="lazy"></figure>
+<h6 id="任务申请">任务申请</h6>
+<p>任务的执行有两种可能:1.线程初创时,直接执行任务.2.线程从阻塞队列中获取任务执行.</p>
+<p>获取任务执行逻辑-getTask():</p>
+<figure data-type="image" tabindex="6"><img src="https://p0.meituan.net/travelcube/49d8041f8480aba5ef59079fcc7143b996706.png" alt="" loading="lazy"></figure>
+<h6 id="任务拒绝">任务拒绝</h6>
+<p>当线程池线程个数达到设置最大线程数(maximumPoolsize)或线程池关闭时,新的任务会到来就会触发拒绝策略,保护线程池.<em>默认拒绝策略</em>-<code>AbortPolicy</code></p>
+<p>线程池四种内置拒绝策略:</p>
+<pre><code class="language-java">/**
+ * 1.AbortPolicy
+ * 直接抛出RejectedExecutionException
+ * 使用场景:当系统超负荷时,需要及时反馈
+ */
+public static class AbortPolicy implements RejectedExecutionHandler {
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        throw new RejectedExecutionException(&quot;Task &quot; + r.toString() +
+                                             &quot; rejected from &quot; +
+                                             e.toString());
+    }
+}
+
+/**
+ * 2.CallerRunsPolicy
+ * 如果线程池不是关闭状态,则负责该任务的线程直接执行
+ * 使用场景:当系统超负荷时,需要所有任务都执行完
+ */
+public static class CallerRunsPolicy implements RejectedExecutionHandler {
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        if (!e.isShutdown()) {
+            r.run();
+        }
+    }
+}
+
+/**
+ * 3.DiscardPolicy
+ * 啥也不做,负责该任务的线程不执行该任务
+ * 使用场景:当系统超负荷时,没有必要再执行新的任务
+ */
+public static class DiscardPolicy implements RejectedExecutionHandler {
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    }
+}
+
+/**
+ * 4.DiscardOldestPolicy
+ * 如果线程池不是关闭状态,任务阻塞队列中队首任务出队,该任务入队尾
+ * 使用场景:当系统超负荷时,需要执行新的任务并不再需要执行老的任务
+ */
+public static class DiscardOldestPolicy implements RejectedExecutionHandler {
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        if (!e.isShutdown()) {
+            e.getQueue().poll();
+            e.execute(r);
+        }
+    }
+}
+
+/**
+ * 5.自定义拒绝策略
+ * 实现rejectExecutioin方法,自定义实现拒绝逻辑
+ * 使用场景:当以上方案都不能满足需求时,自定义拒绝逻辑处理
+ */
+public static class CustomPolicy implements RejectedExecutionHandler {
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+        //拒绝逻辑
+    }
+}
+</code></pre>
+<h5 id="生命周期">生命周期</h5>
+<p>线程池状态不由用户设置,而是在线程池运行时,内部维护.通过一个变量<code>ctl</code>维护了两个值:运行状态<code>runState</code>和工作线程数量<code>workerCount</code>.<code>ctl</code>是<code>AtomicInteger</code>类型,4个字节,32个比特位.其中高3位用来维护<code>runState</code>,低29位用来维护<code>workerCount</code>.这样设计的好处在于:通过位运算,计算<code>ctl</code>就可以得出<code>runState</code>和<code>workerCount</code>,在代码中只用维护一个变量<code>ctl</code>,避免了加锁同步两个变量的操作,同时位运算相比于基本运算也会快很多.</p>
+<pre><code class="language-java">private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+private static final int COUNT_BITS = Integer.SIZE - 3;
+private static final int CAPACITY   = (1 &lt;&lt; COUNT_BITS) - 1;
+
+// runState is stored in the high-order bits
+private static final int RUNNING    = -1 &lt;&lt; COUNT_BITS;
+private static final int SHUTDOWN   =  0 &lt;&lt; COUNT_BITS;
+private static final int STOP       =  1 &lt;&lt; COUNT_BITS;
+private static final int TIDYING    =  2 &lt;&lt; COUNT_BITS;
+private static final int TERMINATED =  3 &lt;&lt; COUNT_BITS;
+
+// Packing and unpacking ctl
+
+//计算当前线程池状态
+private static int runStateOf(int c)     { return c &amp; ~CAPACITY; }
+//当前线程池工作线程个数
+private static int workerCountOf(int c)  { return c &amp; CAPACITY; }
+//通过runState和workerCount计算得出ctl
+private static int ctlOf(int rs, int wc) { return rs | wc; 
+</code></pre>
+<p>runState五种状态代表意义如下:</p>
+<table>
+<thead>
+<tr>
+<th>运行状态</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RUNNING</td>
+<td>运行状态,可接受新的任务,也可处理阻塞队列中的任务</td>
+</tr>
+<tr>
+<td>SHUTDOWN</td>
+<td>关闭状态,不再接受新任务,但可处理阻塞队列中的任务</td>
+</tr>
+<tr>
+<td>STOP</td>
+<td>停止状态,不接受新任务也不处理阻塞队列中的任务,并中断正在运行中的任务</td>
+</tr>
+<tr>
+<td>TIDYING</td>
+<td>完成状态,所有任务被终止,工作线程数为0,将会运行terminated()方法</td>
+</tr>
+<tr>
+<td>TERMINATED</td>
+<td>终止状态,terminated()运行完成</td>
+</tr>
+</tbody>
+</table>
+<p>生命周期转换状态:</p>
+<figure data-type="image" tabindex="7"><img src="https://p0.meituan.net/travelcube/582d1606d57ff99aa0e5f8fc59c7819329028.png" alt="" loading="lazy"></figure>
+<h5 id="工作线程">工作线程</h5>
+<p>线程池为了使内部能够控制线程状态和生命周期,定义了<code>Class Worker</code>的概念.其设计目的在于维护线程运行任务的中断控制状态.它继承了<code>AQS</code>并实现了<code>Runnable</code>接口,在<code>run()</code>方法中执行<code>runWorker()</code>方法,运行处理任务的核心逻辑.继承<code>AQS</code>而不直接使用<code>ReentrantLock</code>的目的在于:在调用一些方法如(<code>setCorePoolSize()</code>时),不希望线程获取锁,所以利用AQS简单实现了一个不可重入互斥锁.</p>
+<pre><code class="language-java">private final class Worker extends AbstractQueuedSynchronizer implements Runnable{
+    /** Thread this worker is running in.  Null if factory fails. */
+    final Thread thread;
+    /** Initial task to run.  Possibly null. */
+    Runnable firstTask;
+    /** Per-thread task counter */
+    volatile long completedTasks;
+    
+    Worker(Runnable firstTask) {
+        setState(-1); // inhibit interrupts until runWorker
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);
+    }
+}
+</code></pre>
+<p>thread:线程池通过线程工厂(<code>ThreadFactory</code>)创建线程,用于用于执行任务.</p>
+<p>firstTask:初始化任务,如果非空,则创建核心线程(<code>addWorker</code>)并立马执行firstTask;如果为空,则创建一个非核心线程执行任务.</p>
+<blockquote>
+<p>核心线程和非核心线程区别在于:</p>
+<p>核心线程会加入<code>corePoolSize</code>,是最小数量的保持活动状态的工作线程(<code>worker</code>)</p>
+<p>非核心线程则不会加入<code>corePoolSize</code>,当超过了<code>keepAliveTime</code>就释放</p>
+</blockquote>
+<h6 id="工作线程执行任务">工作线程执行任务</h6>
+<p>worker中使用runWorker()方法来执行任务,具体流程如下:</p>
+<ol>
+<li>通过while循环获取任务(<code>firstTask或着getTask()</code>)</li>
+<li>申请非重入锁,如果线程池处理正在运行状态,则执行任务.如果是停止状态,则要保证线程中断.</li>
+<li>线程完成任务数+1,释放非重入锁</li>
+<li>任务结束,工作线程退出(<code>processWorkerExit()</code>),销毁线程.</li>
+</ol>
+<figure data-type="image" tabindex="8"><img src="https://p0.meituan.net/travelcube/879edb4f06043d76cea27a3ff358cb1d45243.png" alt="" loading="lazy"></figure>
+<h6 id="工作线程增加">工作线程增加</h6>
+<p>worker中使用addWorker()方法来增加工作线程,具体流程如下:</p>
+<ol>
+<li>获取线程池工作线程数量和线程池状态</li>
+<li>检查线程池是否关闭,大于等于关闭状态,新增工作队列失败</li>
+<li>不在关闭状态下,任务不为空但工作队列为空,新增工作队列失败</li>
+<li>获取工作线程数,若工作线程数超过容量或超过核心线程数,新增工作队列失败</li>
+<li>CAS操作尝试增加工作线程数</li>
+<li>如果增加失败,就继续检查线程池工作状态</li>
+<li>如果工作状态不等于之前的状态则回到第2步;如果相等就继续循环,回到第四步</li>
+<li>如果增加成功,为当前任务新建一个线程,上锁后检查线程池状态,正常就往worker集合中新增线程,否则就抛出异常,中止程序;</li>
+<li>新增线程后释放锁,新增成功启动新增线程,执行任务;启动失败了,则删除worker集合中的新增线程</li>
+</ol>
+<figure data-type="image" tabindex="9"><img src="https://p0.meituan.net/travelcube/49527b1bb385f0f43529e57b614f59ae145454.png" alt="" loading="lazy"></figure>
+<h6 id="工作线程回收">工作线程回收</h6>
+<p>在执行任务方法中(<code>runWorker()</code>),我们知道工作线程在不断循环获取任务,当工作线程无法再获取到任务时,就会中断循环,进入<code>processWorkerExit()</code>方法,完成线程回收.具体流程如下:</p>
+<ol>
+<li>判断线程是否异常中断,如果是则CAS减少一个<code>workerCount</code></li>
+<li>上锁后worker集合删除该工作线程,然后释放锁 (这一步已经完成了工作线程的回收,通过删除集合中工作线程的引用,利用jvm垃圾回收机制回收线程)</li>
+<li>试图关闭线程池,如果线程池工作线程数量为0则关闭,否则不管</li>
+<li>继续判断线程池状态,根据新状态，确认是否需要重新分配线程</li>
+</ol>
+<figure data-type="image" tabindex="10"><img src="https://p0.meituan.net/travelcube/90ea093549782945f2c968403fdc39d415386.png" alt="" loading="lazy"></figure>
+<h4 id="线程池的使用">线程池的使用</h4>
+<p>可以使用ThreadPoolExcutor新建线程池,但JDK推荐使用Excutors利用静态工程方法创建线程池</p>
+<pre><code class="language-java">public class ThreadPoolExecutors {
+
+    /**
+     * 1.使用threadPoolExecutor构造手动创建线程池
+     */
+    private static void threadPoolExecutor() {
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 5, 10, TimeUnit.SECONDS, new SynchronousQueue&lt;&gt;());
+        threadPoolExecutor.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        threadPoolExecutor.shutdown();
+        //输出结果:pool-1-thread-1 execute print task
+    }
+
+    /**
+     * 2.使用Executors创建固定大小线程池 即corePoolSize==maximumPoolSize
+     */
+    private static void fixedThreadPool() {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        executorService.shutdown();//等待线程执行完
+        //输出结果
+        //pool-1-thread-1 execute print task
+        //pool-1-thread-1 execute print task
+        //pool-1-thread-2 execute print task
+    }
+
+    /**
+     * 3.使用Executors创建缓存线程池
+     * 即没有核心工作线程,超过60秒不执行任务的线程将会被回收,有执行任务的将会被创建新的线程
+     * 线程池最大数量为int最大数即2^31-1
+     */
+    private static void cachedThreadPool() {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        // 线程池停止,不再接受新任务也不处理任务队列的任务,并中断正在执行的任务
+        executorService.shutdownNow();//不等待线程执行完,立即停止线程池
+
+        // 输出结果:pool-1-thread-1 execute print task
+        // 然后抛出异常 java.util.concurrent.RejectedExecutionException
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+    }
+
+    /**
+     * 4.使用Executors创建单个线程池
+     * 只有一个工作线程,corePoolSize==maximumPoolSize==1
+     * 等同于Executors.newFixedThreadPool(1);
+     */
+    private static void singleThreadExecutor() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        executorService.submit(()-&gt;{
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        });
+        executorService.shutdown();
+        //输出结果
+        //pool-1-thread-1 execute print task
+        //pool-1-thread-1 execute print task
+    }
+
+    /**
+     * 5.使用Executors创建定时任务线程池
+     */
+    private static void scheduledThreadPool() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+        scheduledExecutorService.schedule(()-&gt;{
+            System.out.println(&quot;当前时间:&quot;+ LocalDateTime.now());
+            System.out.println(Thread.currentThread().getName()+&quot; execute print task&quot;);
+        },5,TimeUnit.SECONDS);
+        scheduledExecutorService.shutdown();
+        //输出结果
+        //当前时间:2021-06-08T13:39:33.041
+        //当前时间:2021-06-08T13:39:38.020
+        //pool-1-thread-1 execute print task
+    }
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%98%AF%E4%BB%80%E4%B9%88">线程池是什么</a></li>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0">为什么使用线程池</a></li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E8%AE%BE%E8%AE%A1">线程池的设计</a>
+<ul>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">工作流程</a>
+<ul>
+<li><a href="#%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B">任务执行流程</a></li>
+<li><a href="#%E4%BB%BB%E5%8A%A1%E7%BC%93%E5%86%B2">任务缓冲</a></li>
+<li><a href="#%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7">任务申请</a></li>
+<li><a href="#%E4%BB%BB%E5%8A%A1%E6%8B%92%E7%BB%9D">任务拒绝</a></li>
+</ul>
+</li>
+<li><a href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F">生命周期</a></li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B">工作线程</a>
+<ul>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1">工作线程执行任务</a></li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E5%A2%9E%E5%8A%A0">工作线程增加</a></li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6">工作线程回收</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BD%BF%E7%94%A8">线程池的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-ge-zhong-suo/">
+              <h3 class="post-title">
+                Java基础篇 - 多线程 - 各种锁
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
