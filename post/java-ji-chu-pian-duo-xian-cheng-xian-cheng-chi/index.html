@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area</title>
-<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623131509570">
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623131658866">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
@@ -11,10 +11,11 @@
 
 
 
-    <meta name="description" content="线程池是什么
-线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.
-为什么使用线程池
-线程池解决的核心问题就是线程资源管理的问题.在..." />
+    <meta name="description" content="
+参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html
+
+线程池是什么
+线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程..." />
     <meta name="keywords" content="线程池,多线程,java" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -24,7 +25,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://nojudgeme.github.io">
-  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623131509570" alt="">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623131658866" alt="">
   </a>
   <h1 class="site-title">
     Huffman&#39;s Study Area
@@ -103,7 +104,10 @@
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <h4 id="线程池是什么">线程池是什么</h4>
+                <blockquote>
+<p>参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</p>
+</blockquote>
+<h4 id="线程池是什么">线程池是什么</h4>
 <p>线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.</p>
 <h4 id="为什么使用线程池">为什么使用线程池</h4>
 <p>线程池解决的核心问题就是线程资源管理的问题.在并发环境中,系统不能确定会有多少任务需要线程执行.那么他们造成的问题在于</p>

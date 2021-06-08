@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-06-08T05:51:54.991Z</updated>
+    <updated>2021-06-08T05:54:27.765Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -16,7 +16,10 @@
         <link href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-xian-cheng-chi/">
         </link>
         <updated>2021-06-08T05:49:12.000Z</updated>
-        <content type="html"><![CDATA[<h4 id="线程池是什么">线程池是什么</h4>
+        <content type="html"><![CDATA[<blockquote>
+<p>参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</p>
+</blockquote>
+<h4 id="线程池是什么">线程池是什么</h4>
 <p>线程池是一种池化思想,通过池来管理线程.线程池中预先创建了一些线程,当有任务进来时,就会分配预留线程去执行任务,执行完毕后线程又回到线程池,完成了对线程的重用.</p>
 <h4 id="为什么使用线程池">为什么使用线程池</h4>
 <p>线程池解决的核心问题就是线程资源管理的问题.在并发环境中,系统不能确定会有多少任务需要线程执行.那么他们造成的问题在于</p>
