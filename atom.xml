@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-06-09T03:47:04.281Z</updated>
+    <updated>2021-06-10T09:57:11.565Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -10,6 +10,343 @@
     <logo>https://nojudgeme.github.io/images/avatar.png</logo>
     <icon>https://nojudgeme.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Huffman&apos;s Study Area</rights>
+    <entry>
+        <title type="html"><![CDATA[Java基础篇 - 多线程 - ThreadLocal]]></title>
+        <id>https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-threadlocal/</id>
+        <link href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-threadlocal/">
+        </link>
+        <updated>2021-06-10T09:56:11.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="threadlocal是什么">ThreadLocal是什么</h4>
+<p>ThreadLocal为每个线程提供了一个独立的局部变量,线程间变量隔离,互不冲突.</p>
+<h4 id="为什么使用threadlocal">为什么使用ThreadLocal</h4>
+<p>ThreadLocal的设计目的在于:为每个线程提供一个局部变量,而不是为了解决并发和共享变量的问题.</p>
+<p>当我们想定义一份线程级别的全局变量时(<em>即想在任何类任何方法中都可以获取到当前线程的变量</em>),就可以使用ThreadLocal.</p>
+<p>使用场景如:session/cookie存放变量、全局的日志ID用来追踪日志链路</p>
+<h4 id="threadlocal的设计">ThreadLocal的设计</h4>
+<p>ThreadLocal仅对外提供了四个公有方法：<code>withInitial(Supplier&lt;? extends S&gt; supplier)、get()、set(T value)、remove()</code>,以及默认构造方法.我们从初始化流程/创建/使用/删除流程逐步分析.</p>
+<h5 id="threadlocal初始化">ThreadLocal初始化</h5>
+<p>ThreadLocal提供两种方式初始化:无参构造方法和使用<code>withInitial(Supplier&lt;? extends S&gt; supplier)</code></p>
+<pre><code class="language-java">/**
+ * Creates a thread local variable.
+ * @see #withInitial(java.util.function.Supplier)
+  */
+public ThreadLocal() {
+}
+
+/**
+ * Creates a thread local variable. The initial value of the variable is
+ * determined by invoking the {@code get} method on the {@code Supplier}.
+ *
+ * @param &lt;S&gt; the type of the thread local's value
+ * @param supplier the supplier to be used to determine the initial value
+ * @return a new thread local variable
+ * @throws NullPointerException if the specified supplier is null
+ * @since 1.8
+ */
+public static &lt;S&gt; ThreadLocal&lt;S&gt; withInitial(Supplier&lt;? extends S&gt; supplier) {
+    return new SuppliedThreadLocal&lt;&gt;(supplier);
+}
+</code></pre>
+<p>无参构造方法内无任何实现,我们重点观察<code>withInitial(Supplier&lt;? extends S&gt; supplier)</code></p>
+<p>传入参数为<code>Supplier&lt;? extends S&gt; supplier</code>,Supplier是JDK1.8提供的函数式接口,主要作用为返回一个结果.</p>
+<pre><code class="language-java">@FunctionalInterface
+public interface Supplier&lt;T&gt; {
+
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    T get();
+}
+</code></pre>
+<p>返回值为<code>new SuppliedThreadLocal&lt;&gt;(supplier)</code>.<code>SuppliedThreadLocal</code>是ThreadLocal定义的静态内部类,</p>
+<p>仅只有一个重写了父类的<code>initialValue()</code>方法,默认使用<code>supplier</code>的<code>get()</code>实现方法,得到<code>get()返回值</code>传递给ThreadLocal.</p>
+<pre><code class="language-java">static final class SuppliedThreadLocal&lt;T&gt; extends ThreadLocal&lt;T&gt; {
+
+    private final Supplier&lt;? extends T&gt; supplier;
+
+    SuppliedThreadLocal(Supplier&lt;? extends T&gt; supplier) {
+        this.supplier = Objects.requireNonNull(supplier);
+    }
+
+    @Override
+    protected T initialValue() {
+        return supplier.get();
+    }
+}
+</code></pre>
+<p>所以我们一般使用如下两种方式初始化ThreadLocal:</p>
+<pre><code class="language-java">/**
+ * 两种初始化方式
+ * 1.使用无参构造,不带初始值
+ * 2.使用withInitial()静态方法,实现Supplier接口,带初始值
+ */
+private static void initThreadLocal() {
+    ThreadLocal&lt;Integer&gt; threadLocal1 = new ThreadLocal&lt;&gt;();
+    ThreadLocal&lt;Integer&gt; threadLocal2 = ThreadLocal.withInitial(()-&gt; 1);
+}
+</code></pre>
+<h5 id="threadlocal赋值">ThreadLocal赋值</h5>
+<p>ThreadLocal提供两种赋值方法:对外的<code>set(T value)</code>与对内的<code>setInitialValue()</code></p>
+<pre><code class="language-java">private T setInitialValue() {
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
+    return value;
+}
+
+public void set(T value) {
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
+}
+
+ThreadLocalMap getMap(Thread t) {
+    return t.threadLocals;
+}
+
+void createMap(Thread t, T firstValue) {
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
+}
+</code></pre>
+<p>可以从代码看到,主要区别在于<code>setInitialValue()</code>从初始化方法中取值,<code>set()</code>从参数中取值;</p>
+<p>共同点在于:都通过<code>getMap()</code>方法取得<code>ThreadLocalMap</code>,并使用<code>ThreadLocalMap</code>保存当前<code>实例对象</code>和<code>传入参数value</code>;</p>
+<h5 id="threadlocal取值">ThreadLocal取值</h5>
+<p>ThreadLocal仅提供一个对外的取值方法:<code>get()</code></p>
+<pre><code class="language-java">public T get() {
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null) {
+        ThreadLocalMap.Entry e = map.getEntry(this);
+        if (e != null) {
+            @SuppressWarnings(&quot;unchecked&quot;)
+            T result = (T)e.value;
+            return result;
+        }
+    }
+    return setInitialValue();
+}
+</code></pre>
+<p>取值逻辑:通过当前线程获取到<code>ThreadLocalMap</code>,如果不为空则返回<code>ThreadLocalMap</code>内部维护的<code>Entry.value</code>.如果为空则返回初始化时赋的值,如果没赋值则返回null.</p>
+<h5 id="threadlocal回收">ThreadLocal回收</h5>
+<p>通过删除<code>ThreadLocalMap</code>中的当前实例<code>this</code>的引用,达到回收ThreadLocal的目的</p>
+<pre><code class="language-java"> public void remove() {
+     ThreadLocalMap m = getMap(Thread.currentThread());
+     if (m != null)
+         m.remove(this);
+ }
+</code></pre>
+<h5 id="threadlocalmap">ThreadLocalMap</h5>
+<p>上面的赋值、取值和回收功能都是通过<code>ThreadLocalMap</code>实现的，那让我们看看<code>ThreadLocalMap</code>究竟是什么</p>
+<pre><code class="language-java">/**
+ * ThreadLocalMap 是一种定制的哈希映射，仅适用于维护线程本地值。 
+ * 不会在 ThreadLocal 类之外导出任何操作。 
+ * 该类是包私有的，以允许在类 Thread 中声明字段
+ */
+static class ThreadLocalMap {
+    
+    /**
+     * 一个静态内部类，使用ThreadLocal实例作为key,传入参数为value
+     * 继承WeakReference目的在于,key(也就是threadLocal实例对象)在经过gc后会变成null
+     */
+    static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+        /** The value associated with this ThreadLocal. */
+        Object value;
+
+        Entry(ThreadLocal&lt;?&gt; k, Object v) {
+            super(k);
+            value = v;
+        }
+    }
+    
+    private Entry[] table;
+    private int size = 0;
+    private int threshold; // Default to 0
+    
+    /**
+     * 赋值操作中，createMap就使用该构造器
+     */
+    ThreadLocalMap(ThreadLocal&lt;?&gt; firstKey, Object firstValue) {
+        //创建一个大小为16的Entry数组
+        table = new Entry[INITIAL_CAPACITY];
+        //取模保证i的取值大小在16的循环里，目的是将entry打散，避免哈希冲突
+        int i = firstKey.threadLocalHashCode &amp; (INITIAL_CAPACITY - 1);
+        table[i] = new Entry(firstKey, firstValue);
+        size = 1;
+        //设置阈值，在扩/缩容时起作用
+        setThreshold(INITIAL_CAPACITY);
+    }
+    
+    /**
+     * threadLocal的赋值逻辑
+     */
+    private void set(ThreadLocal&lt;?&gt; key, Object value) {
+        Entry[] tab = table;
+        int len = tab.length;
+        int i = key.threadLocalHashCode &amp; (len-1);
+
+        //循环遍历数组Entry
+        for (Entry e = tab[i];
+             e != null;
+             e = tab[i = nextIndex(i, len)]) {
+            ThreadLocal&lt;?&gt; k = e.get();
+			//如果entry e中记录的this对象与传入key一致，则覆盖e的value
+            if (k == key) {
+                e.value = value;
+                return;
+            }
+			//如果entry e中记录的是null(可能被gc回收了)，则直接赋值value
+            if (k == null) {
+                replaceStaleEntry(key, value, i);
+                return;
+            }
+            //如果没有return,则找到数组中下一个e,继续循环,直到e为空
+        }
+		//空e则直接创建一个新的Entry
+        tab[i] = new Entry(key, value);
+        int sz = ++size;
+        //如果数组元素超过阈值,则扩容
+        if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
+            rehash();
+    }
+    
+    /**
+     * threadLocal的取值逻辑
+     */
+    private Entry getEntry(ThreadLocal&lt;?&gt; key) {
+        int i = key.threadLocalHashCode &amp; (table.length - 1);
+        Entry e = table[i];
+        if (e != null &amp;&amp; e.get() == key)
+            //通过传入的this对象,计算得出它的哈希码对应的数组下标,找到entry,一致则返回
+            return e;
+        else
+            //否则调用getEntryAfterMiss()方法
+            return getEntryAfterMiss方法(key, i, e);
+    }
+    
+    private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
+        Entry[] tab = table;
+        int len = tab.length;
+		
+        //如果通过传入的this对象计算哈希码能找到entry,
+        //但记录的entry.key又与当前this对象不一致时,进入循环
+        while (e != null) {
+            ThreadLocal&lt;?&gt; k = e.get();
+            //一致时,直接返回
+            if (k == key)
+                return e;
+            //为空时,把此时this计算哈希码槽位上的entry元素删掉,然后把整个数组重新计算哈希分布
+            if (k == null)
+                expungeStaleEntry(i);
+            else
+            //当entry既不为空又不一致时,就找到下一个entry,直到找到相同的threadLocal
+                i = nextIndex(i, len);
+            e = tab[i];
+        }
+        //否则直接返回null
+        return null;
+    }
+    
+    /**
+     * threadLocal删除逻辑
+     */
+    private void remove(ThreadLocal&lt;?&gt; key) {
+        Entry[] tab = table;
+        int len = tab.length;
+        int i = key.threadLocalHashCode &amp; (len-1);
+        //和set的循环逻辑一样,都是通过传入this,计算对应的哈希槽位
+        //找到对应的entry,判断是否与key相等,不相等则继续找到下一个entry,直到找不到为止
+        for (Entry e = tab[i];
+             e != null;
+             e = tab[i = nextIndex(i, len)]) {
+            if (e.get() == key) {
+                e.clear();//将value设置为null
+                expungeStaleEntry(i);//清除该槽位的entry,然后rehash
+                return;
+            }
+        }
+    }
+}
+</code></pre>
+<p>工作流程图:</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/ThreadLocal%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="ThreadLocal流程图" loading="lazy"></figure>
+<blockquote>
+<p>总结:</p>
+<ol>
+<li>ThreadLocal本身不存储数据,而是通过内部维护的ThreadLocalMap和Entry来存储.</li>
+<li>ThreadLocalMap本质上就是一个哈希数组,下标为threadLocal计算得出的哈希码,元素为Entry.</li>
+<li>Entry中key存放this对象(ThreadLocal)的弱引用,value存放值.</li>
+<li>threadLocal的赋值/取值/回收操作都是通过操作ThreadLocalMap中的Entry数组实现.</li>
+</ol>
+</blockquote>
+<h4 id="threadlocal的使用">ThreadLocal的使用</h4>
+<pre><code class="language-java">public class GlobalID implements AutoCloseable{
+
+    private static final ThreadLocal&lt;AtomicInteger&gt; GLOBAL_ID = ThreadLocal.withInitial(()-&gt;new AtomicInteger(0));
+
+    public int getGlobalID(){
+        return GLOBAL_ID.get().incrementAndGet();
+    }
+
+    /**
+     * try(resource){..} 自动回收
+     * @throws Exception
+     */
+    @Override
+    public void close(){
+        GLOBAL_ID.remove();
+    }
+}
+
+@Slf4j(topic = &quot;id&quot;)
+public class TestThreadLocal {
+
+    public static void main(String[] args) {
+        try (GlobalID globalID = new GlobalID()) {
+            Thread threadA = new Thread(() -&gt; {
+                log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                        Thread.currentThread().getName(),
+                        Thread.currentThread().getStackTrace()[2].getMethodName());
+                log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+            }, &quot;thread-a&quot;);
+
+            Thread threadB = new Thread(() -&gt; {
+                log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                        Thread.currentThread().getName(),
+                        Thread.currentThread().getStackTrace()[2].getMethodName());
+                log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+            }, &quot;thread-b&quot;);
+
+            threadA.start();
+            threadB.start();
+
+            log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                    Thread.currentThread().getName(),
+                    Thread.currentThread().getStackTrace()[1].getMethodName());
+            log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+
+            log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                    Thread.currentThread().getName(),
+                    Thread.currentThread().getStackTrace()[1].getMethodName());
+            log.info(Thread.currentThread().getName() + &quot;有完没完啊!!!!!&quot;);
+        }
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210610175354.png" alt="截图_选择区域_20210610175354" loading="lazy"></figure>
+<blockquote>
+<p>ThreadLocal生成的GlobalID相对与每一个线程是全局唯一的.所以我们可以通过线程名和GlobalID追踪日志的工作链路.</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Java基础篇 - 多线程 - 线程池]]></title>
         <id>https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-xian-cheng-chi/</id>
@@ -2718,307 +3055,6 @@ public class ArrayStack&lt;E&gt; implements Stack&lt;E&gt;{
 <p>注意事项:</p>
 <p>1.无论栈的数据结构实现是什么,用户并不关心,只用知道如何操作栈元素即可(入栈:push,出栈:pop,查看栈顶元素:peek).</p>
 <p>2.基于动态数组实现的栈十分简单,进行栈元素操作时,直接使用动态数组提供的添加/删除元素操作,就可以实现栈元素的操作.但需要注意的是,栈是FILO(先进后出 first in last out)或者是LIFO(后进先出 last in first out),故在添加/删除栈元素时,是入头元素和出头元素.这一点与队列相反!</p>
-</blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[从零开始学算法 - 数组]]></title>
-        <id>https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-shu-zu/</id>
-        <link href="https://nojudgeme.github.io/post/cong-ling-kai-shi-xue-suan-fa-shu-zu/">
-        </link>
-        <updated>2021-04-09T02:33:05.000Z</updated>
-        <content type="html"><![CDATA[<pre><code class="language-java">/**
- * Functional Purpose - 动态数组 类似java.util.ArrayList
- *
- * @author huffman
- * @date:2021-04-06 下午5:26
- */
-public class Arrays&lt;E&gt; {
-
-    /**
-     * 初始化数组数据
-     */
-    private E[] data;
-
-    /**
-     * 数组实际容量
-     */
-    private int size;
-
-    /**
-     * 扩容因子
-     */
-    private int resizeFactor = 2;
-
-    /**
-     * 以数组e初始化数组
-     *
-     * @param e 数组
-     */
-    public Arrays(E[] e) {
-        this.data = e;
-    }
-
-    /**
-     * 以最大容量为capacity初始化数组
-     *
-     * @param capacity 最大容量
-     */
-    public Arrays(int capacity) {
-        data = (E[]) new Object[capacity];
-        size = 0;
-    }
-
-    /**
-     * 以默认容量10初始化数组
-     */
-    public Arrays() {
-        this(10);
-    }
-
-    /**
-     * 数组内元素是否为空
-     *
-     * @return
-     */
-    public boolean isEmpty() {
-        return this.size == 0;
-    }
-
-    /**
-     * 获取实际元素个数
-     *
-     * @return
-     */
-    public int getSize() {
-        return size;
-    }
-
-    /**
-     * 获取最大容量大小
-     */
-    public int getCapacity() {
-        return data.length;
-    }
-
-    /**
-     * 从指定位置插入元素
-     */
-    public void addElement(E e, int index) {
-        checkIndex(index);
-        //实际存储元素的容量已经满了
-        if (size == data.length) {
-            resize(resizeFactor * getCapacity());
-        }
-        //从下标为size-1的元素开始 从后往前挪动一位元素,即index+1的元素=index的元素
-        for (int i = size - 1; i &gt;= index; i--) {
-            data[i + 1] = data[i];
-        }
-        data[index] = e;
-        size++;
-    }
-
-    /**
-     * 从末尾新增元素
-     */
-    public void addLast(E e) {
-        addElement(e, size);
-    }
-
-    /**
-     * 从头尾新增元素
-     */
-    public void addFirst(E e) {
-        addElement(e, 0);
-    }
-
-    /**
-     * 获取指定下标元素
-     *
-     * @param index
-     * @return
-     */
-    public E getElement(int index) {
-        checkIndex(index);
-        return data[index];
-    }
-
-    /**
-     * 获取最后一个元素
-     * @return
-     */
-    public E getLastElement() {
-        return getElement(size-1);
-    }
-
-    /**
-     * 获取第一个元素
-     * @return
-     */
-    public E getFirstElement() {
-        return getElement(0);
-    }
-
-    /**
-     * 修改指定下标元素为e
-     *
-     * @param e
-     * @param index
-     */
-    public void setElement(E e, int index) {
-        checkIndex(index);
-        data[index] = e;
-    }
-
-    /**
-     * 检查下标
-     *
-     * @param index
-     */
-    public void checkIndex(int index) {
-        //下标不能为负且数组得是连续的元素 所以也不能大于size,不然中间会出现空缺元素
-        if (index &lt; 0 || index &gt; size) {
-            throw new IllegalArgumentException(&quot;AddElement failed. The index can't be less then 0 or more than capacity&quot;);
-        }
-    }
-
-    /**
-     * 检查数组中是否包含元素e
-     *
-     * @param e
-     * @return
-     */
-    public boolean contains(E e) {
-        for (int i = 0; i &lt; size; i++) {
-            if (data[i].equals(e)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 寻找数组中e元素的下标,若没有则返回-1
-     *
-     * @param e
-     * @return
-     */
-    public int findElement(E e) {
-        for (int i = 0; i &lt; size; i++) {
-            if (data[i].equals(e)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * 寻找数组中所有e元素的下标
-     *
-     * @param e
-     * @return todo:不对 需要调整或删除
-     */
-    @Deprecated
-    public int[] findAllElements(E e) {
-        int[] indexArray = new int[size];
-        int index = 0;
-        for (int i = 0; i &lt; size; i++) {
-            if (data[i].equals(e)) {
-                indexArray[index++] = i;
-            }
-        }
-        return indexArray;
-    }
-
-    /**
-     * 删除数组中指定下标的元素,返回删除后的元素
-     *
-     * @param index
-     * @return
-     */
-    public E remove(int index) {
-        checkIndex(index);
-        E e = data[index];
-        for (int i = index+1; i &lt; size; i++) {
-            data[i-1] = data[i];
-        }
-        size--;
-
-        if (size &lt;= getCapacity() / resizeFactor / 2 &amp;&amp; getCapacity() / 2 != 0) {//懒处理 不及时缩容
-            resize(getCapacity() / resizeFactor);
-        }
-        return e;
-    }
-
-    /**
-     * 删除数组中第一个元素
-     *
-     * @return
-     */
-    public E removeFirst() {
-        return remove(0);
-    }
-
-    /**
-     * 删除数组中最后一个元素
-     *
-     * @return
-     */
-    public E removeLast() {
-        return remove(size - 1);
-    }
-
-    /**
-     * 删除一个元素e
-     *
-     * @param e
-     */
-    public void removeElement(E e) {
-        if (contains(e)) {
-            int index = findElement(e);
-            remove(index);
-        }
-    }
-
-    /**
-     * 删除所有元素e
-     *
-     * @param e todo:不对 需要调整或删除
-     */
-    @Deprecated
-    public void removeAllElements(E e) {
-        if (contains(e)) {
-            for (Integer index : findAllElements(e)) {
-                remove(index);
-            }
-        }
-    }
-
-    @Override
-    public String toString() {
-        return &quot;Arrays{&quot; +
-                &quot; size=&quot; + size +
-                &quot;, capacity=&quot; + data.length +
-                &quot;,data=&quot; + java.util.Arrays.toString(data) +
-                '}';
-    }
-
-    private void resize(int newCapacity) {
-        E[] newArray = (E[]) new Object[newCapacity];
-        for (int i = 0; i &lt; size; i++) {
-            newArray[i] = data[i];
-        }
-        data = newArray;
-    }
-
-}
-</code></pre>
-<blockquote>
-<p>注意事项:</p>
-<p>1.在指定下标操作元素时,要注意下标是否越界</p>
-<p>2.在增加/删除元素时,要注意数组的大小,满了就扩容,少了就缩容.缩容时,要避免出现刚扩容后,立马缩容的情况,这样会增加时间复杂度,所以这里我们粗略的采用:当元素总数为容积的<strong>1/4</strong>时,进行容积的<strong>1/2</strong>缩容.</p>
-<p>3.同时,增加/删除元素时,要同时维护元素总数(size)</p>
-<p>4.扩容时复制元素至新数组,容量大小为 resizeFactor*capacity</p>
 </blockquote>
 ]]></content>
     </entry>

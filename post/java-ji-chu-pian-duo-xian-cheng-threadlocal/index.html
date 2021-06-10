@@ -1,0 +1,560 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Java基础篇 - 多线程 - ThreadLocal | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623319009694">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - ThreadLocal | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="ThreadLocal是什么
+ThreadLocal为每个线程提供了一个独立的局部变量,线程间变量隔离,互不冲突.
+为什么使用ThreadLocal
+ThreadLocal的设计目的在于:为每个线程提供一个局部变量,而不是为了解决并发和共享..." />
+    <meta name="keywords" content="ThreadLocal,多线程,java" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623319009694" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Java基础篇 - 多线程 - ThreadLocal
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-06-10
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/NRE95BL1J/" class="post-tag">
+                  # ThreadLocal
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/UQVDT19g1/" class="post-tag">
+                  # 多线程
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/EUZzkmvvt/" class="post-tag">
+                  # java
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h4 id="threadlocal是什么">ThreadLocal是什么</h4>
+<p>ThreadLocal为每个线程提供了一个独立的局部变量,线程间变量隔离,互不冲突.</p>
+<h4 id="为什么使用threadlocal">为什么使用ThreadLocal</h4>
+<p>ThreadLocal的设计目的在于:为每个线程提供一个局部变量,而不是为了解决并发和共享变量的问题.</p>
+<p>当我们想定义一份线程级别的全局变量时(<em>即想在任何类任何方法中都可以获取到当前线程的变量</em>),就可以使用ThreadLocal.</p>
+<p>使用场景如:session/cookie存放变量、全局的日志ID用来追踪日志链路</p>
+<h4 id="threadlocal的设计">ThreadLocal的设计</h4>
+<p>ThreadLocal仅对外提供了四个公有方法：<code>withInitial(Supplier&lt;? extends S&gt; supplier)、get()、set(T value)、remove()</code>,以及默认构造方法.我们从初始化流程/创建/使用/删除流程逐步分析.</p>
+<h5 id="threadlocal初始化">ThreadLocal初始化</h5>
+<p>ThreadLocal提供两种方式初始化:无参构造方法和使用<code>withInitial(Supplier&lt;? extends S&gt; supplier)</code></p>
+<pre><code class="language-java">/**
+ * Creates a thread local variable.
+ * @see #withInitial(java.util.function.Supplier)
+  */
+public ThreadLocal() {
+}
+
+/**
+ * Creates a thread local variable. The initial value of the variable is
+ * determined by invoking the {@code get} method on the {@code Supplier}.
+ *
+ * @param &lt;S&gt; the type of the thread local's value
+ * @param supplier the supplier to be used to determine the initial value
+ * @return a new thread local variable
+ * @throws NullPointerException if the specified supplier is null
+ * @since 1.8
+ */
+public static &lt;S&gt; ThreadLocal&lt;S&gt; withInitial(Supplier&lt;? extends S&gt; supplier) {
+    return new SuppliedThreadLocal&lt;&gt;(supplier);
+}
+</code></pre>
+<p>无参构造方法内无任何实现,我们重点观察<code>withInitial(Supplier&lt;? extends S&gt; supplier)</code></p>
+<p>传入参数为<code>Supplier&lt;? extends S&gt; supplier</code>,Supplier是JDK1.8提供的函数式接口,主要作用为返回一个结果.</p>
+<pre><code class="language-java">@FunctionalInterface
+public interface Supplier&lt;T&gt; {
+
+    /**
+     * Gets a result.
+     *
+     * @return a result
+     */
+    T get();
+}
+</code></pre>
+<p>返回值为<code>new SuppliedThreadLocal&lt;&gt;(supplier)</code>.<code>SuppliedThreadLocal</code>是ThreadLocal定义的静态内部类,</p>
+<p>仅只有一个重写了父类的<code>initialValue()</code>方法,默认使用<code>supplier</code>的<code>get()</code>实现方法,得到<code>get()返回值</code>传递给ThreadLocal.</p>
+<pre><code class="language-java">static final class SuppliedThreadLocal&lt;T&gt; extends ThreadLocal&lt;T&gt; {
+
+    private final Supplier&lt;? extends T&gt; supplier;
+
+    SuppliedThreadLocal(Supplier&lt;? extends T&gt; supplier) {
+        this.supplier = Objects.requireNonNull(supplier);
+    }
+
+    @Override
+    protected T initialValue() {
+        return supplier.get();
+    }
+}
+</code></pre>
+<p>所以我们一般使用如下两种方式初始化ThreadLocal:</p>
+<pre><code class="language-java">/**
+ * 两种初始化方式
+ * 1.使用无参构造,不带初始值
+ * 2.使用withInitial()静态方法,实现Supplier接口,带初始值
+ */
+private static void initThreadLocal() {
+    ThreadLocal&lt;Integer&gt; threadLocal1 = new ThreadLocal&lt;&gt;();
+    ThreadLocal&lt;Integer&gt; threadLocal2 = ThreadLocal.withInitial(()-&gt; 1);
+}
+</code></pre>
+<h5 id="threadlocal赋值">ThreadLocal赋值</h5>
+<p>ThreadLocal提供两种赋值方法:对外的<code>set(T value)</code>与对内的<code>setInitialValue()</code></p>
+<pre><code class="language-java">private T setInitialValue() {
+    T value = initialValue();
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
+    return value;
+}
+
+public void set(T value) {
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null)
+        map.set(this, value);
+    else
+        createMap(t, value);
+}
+
+ThreadLocalMap getMap(Thread t) {
+    return t.threadLocals;
+}
+
+void createMap(Thread t, T firstValue) {
+    t.threadLocals = new ThreadLocalMap(this, firstValue);
+}
+</code></pre>
+<p>可以从代码看到,主要区别在于<code>setInitialValue()</code>从初始化方法中取值,<code>set()</code>从参数中取值;</p>
+<p>共同点在于:都通过<code>getMap()</code>方法取得<code>ThreadLocalMap</code>,并使用<code>ThreadLocalMap</code>保存当前<code>实例对象</code>和<code>传入参数value</code>;</p>
+<h5 id="threadlocal取值">ThreadLocal取值</h5>
+<p>ThreadLocal仅提供一个对外的取值方法:<code>get()</code></p>
+<pre><code class="language-java">public T get() {
+    Thread t = Thread.currentThread();
+    ThreadLocalMap map = getMap(t);
+    if (map != null) {
+        ThreadLocalMap.Entry e = map.getEntry(this);
+        if (e != null) {
+            @SuppressWarnings(&quot;unchecked&quot;)
+            T result = (T)e.value;
+            return result;
+        }
+    }
+    return setInitialValue();
+}
+</code></pre>
+<p>取值逻辑:通过当前线程获取到<code>ThreadLocalMap</code>,如果不为空则返回<code>ThreadLocalMap</code>内部维护的<code>Entry.value</code>.如果为空则返回初始化时赋的值,如果没赋值则返回null.</p>
+<h5 id="threadlocal回收">ThreadLocal回收</h5>
+<p>通过删除<code>ThreadLocalMap</code>中的当前实例<code>this</code>的引用,达到回收ThreadLocal的目的</p>
+<pre><code class="language-java"> public void remove() {
+     ThreadLocalMap m = getMap(Thread.currentThread());
+     if (m != null)
+         m.remove(this);
+ }
+</code></pre>
+<h5 id="threadlocalmap">ThreadLocalMap</h5>
+<p>上面的赋值、取值和回收功能都是通过<code>ThreadLocalMap</code>实现的，那让我们看看<code>ThreadLocalMap</code>究竟是什么</p>
+<pre><code class="language-java">/**
+ * ThreadLocalMap 是一种定制的哈希映射，仅适用于维护线程本地值。 
+ * 不会在 ThreadLocal 类之外导出任何操作。 
+ * 该类是包私有的，以允许在类 Thread 中声明字段
+ */
+static class ThreadLocalMap {
+    
+    /**
+     * 一个静态内部类，使用ThreadLocal实例作为key,传入参数为value
+     * 继承WeakReference目的在于,key(也就是threadLocal实例对象)在经过gc后会变成null
+     */
+    static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
+        /** The value associated with this ThreadLocal. */
+        Object value;
+
+        Entry(ThreadLocal&lt;?&gt; k, Object v) {
+            super(k);
+            value = v;
+        }
+    }
+    
+    private Entry[] table;
+    private int size = 0;
+    private int threshold; // Default to 0
+    
+    /**
+     * 赋值操作中，createMap就使用该构造器
+     */
+    ThreadLocalMap(ThreadLocal&lt;?&gt; firstKey, Object firstValue) {
+        //创建一个大小为16的Entry数组
+        table = new Entry[INITIAL_CAPACITY];
+        //取模保证i的取值大小在16的循环里，目的是将entry打散，避免哈希冲突
+        int i = firstKey.threadLocalHashCode &amp; (INITIAL_CAPACITY - 1);
+        table[i] = new Entry(firstKey, firstValue);
+        size = 1;
+        //设置阈值，在扩/缩容时起作用
+        setThreshold(INITIAL_CAPACITY);
+    }
+    
+    /**
+     * threadLocal的赋值逻辑
+     */
+    private void set(ThreadLocal&lt;?&gt; key, Object value) {
+        Entry[] tab = table;
+        int len = tab.length;
+        int i = key.threadLocalHashCode &amp; (len-1);
+
+        //循环遍历数组Entry
+        for (Entry e = tab[i];
+             e != null;
+             e = tab[i = nextIndex(i, len)]) {
+            ThreadLocal&lt;?&gt; k = e.get();
+			//如果entry e中记录的this对象与传入key一致，则覆盖e的value
+            if (k == key) {
+                e.value = value;
+                return;
+            }
+			//如果entry e中记录的是null(可能被gc回收了)，则直接赋值value
+            if (k == null) {
+                replaceStaleEntry(key, value, i);
+                return;
+            }
+            //如果没有return,则找到数组中下一个e,继续循环,直到e为空
+        }
+		//空e则直接创建一个新的Entry
+        tab[i] = new Entry(key, value);
+        int sz = ++size;
+        //如果数组元素超过阈值,则扩容
+        if (!cleanSomeSlots(i, sz) &amp;&amp; sz &gt;= threshold)
+            rehash();
+    }
+    
+    /**
+     * threadLocal的取值逻辑
+     */
+    private Entry getEntry(ThreadLocal&lt;?&gt; key) {
+        int i = key.threadLocalHashCode &amp; (table.length - 1);
+        Entry e = table[i];
+        if (e != null &amp;&amp; e.get() == key)
+            //通过传入的this对象,计算得出它的哈希码对应的数组下标,找到entry,一致则返回
+            return e;
+        else
+            //否则调用getEntryAfterMiss()方法
+            return getEntryAfterMiss方法(key, i, e);
+    }
+    
+    private Entry getEntryAfterMiss(ThreadLocal&lt;?&gt; key, int i, Entry e) {
+        Entry[] tab = table;
+        int len = tab.length;
+		
+        //如果通过传入的this对象计算哈希码能找到entry,
+        //但记录的entry.key又与当前this对象不一致时,进入循环
+        while (e != null) {
+            ThreadLocal&lt;?&gt; k = e.get();
+            //一致时,直接返回
+            if (k == key)
+                return e;
+            //为空时,把此时this计算哈希码槽位上的entry元素删掉,然后把整个数组重新计算哈希分布
+            if (k == null)
+                expungeStaleEntry(i);
+            else
+            //当entry既不为空又不一致时,就找到下一个entry,直到找到相同的threadLocal
+                i = nextIndex(i, len);
+            e = tab[i];
+        }
+        //否则直接返回null
+        return null;
+    }
+    
+    /**
+     * threadLocal删除逻辑
+     */
+    private void remove(ThreadLocal&lt;?&gt; key) {
+        Entry[] tab = table;
+        int len = tab.length;
+        int i = key.threadLocalHashCode &amp; (len-1);
+        //和set的循环逻辑一样,都是通过传入this,计算对应的哈希槽位
+        //找到对应的entry,判断是否与key相等,不相等则继续找到下一个entry,直到找不到为止
+        for (Entry e = tab[i];
+             e != null;
+             e = tab[i = nextIndex(i, len)]) {
+            if (e.get() == key) {
+                e.clear();//将value设置为null
+                expungeStaleEntry(i);//清除该槽位的entry,然后rehash
+                return;
+            }
+        }
+    }
+}
+</code></pre>
+<p>工作流程图:</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/ThreadLocal%E6%B5%81%E7%A8%8B%E5%9B%BE.png" alt="ThreadLocal流程图" loading="lazy"></figure>
+<blockquote>
+<p>总结:</p>
+<ol>
+<li>ThreadLocal本身不存储数据,而是通过内部维护的ThreadLocalMap和Entry来存储.</li>
+<li>ThreadLocalMap本质上就是一个哈希数组,下标为threadLocal计算得出的哈希码,元素为Entry.</li>
+<li>Entry中key存放this对象(ThreadLocal)的弱引用,value存放值.</li>
+<li>threadLocal的赋值/取值/回收操作都是通过操作ThreadLocalMap中的Entry数组实现.</li>
+</ol>
+</blockquote>
+<h4 id="threadlocal的使用">ThreadLocal的使用</h4>
+<pre><code class="language-java">public class GlobalID implements AutoCloseable{
+
+    private static final ThreadLocal&lt;AtomicInteger&gt; GLOBAL_ID = ThreadLocal.withInitial(()-&gt;new AtomicInteger(0));
+
+    public int getGlobalID(){
+        return GLOBAL_ID.get().incrementAndGet();
+    }
+
+    /**
+     * try(resource){..} 自动回收
+     * @throws Exception
+     */
+    @Override
+    public void close(){
+        GLOBAL_ID.remove();
+    }
+}
+
+@Slf4j(topic = &quot;id&quot;)
+public class TestThreadLocal {
+
+    public static void main(String[] args) {
+        try (GlobalID globalID = new GlobalID()) {
+            Thread threadA = new Thread(() -&gt; {
+                log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                        Thread.currentThread().getName(),
+                        Thread.currentThread().getStackTrace()[2].getMethodName());
+                log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+            }, &quot;thread-a&quot;);
+
+            Thread threadB = new Thread(() -&gt; {
+                log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                        Thread.currentThread().getName(),
+                        Thread.currentThread().getStackTrace()[2].getMethodName());
+                log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+            }, &quot;thread-b&quot;);
+
+            threadA.start();
+            threadB.start();
+
+            log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                    Thread.currentThread().getName(),
+                    Thread.currentThread().getStackTrace()[1].getMethodName());
+            log.info(Thread.currentThread().getName() + &quot;开始工作啦!!!!!&quot;);
+
+            log.info(&quot;GlobalID [{}] record :Thread [{}] execute method name:{}&quot;, globalID.getGlobalID(),
+                    Thread.currentThread().getName(),
+                    Thread.currentThread().getStackTrace()[1].getMethodName());
+            log.info(Thread.currentThread().getName() + &quot;有完没完啊!!!!!&quot;);
+        }
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210610175354.png" alt="截图_选择区域_20210610175354" loading="lazy"></figure>
+<blockquote>
+<p>ThreadLocal生成的GlobalID相对与每一个线程是全局唯一的.所以我们可以通过线程名和GlobalID追踪日志的工作链路.</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#threadlocal%E6%98%AF%E4%BB%80%E4%B9%88">ThreadLocal是什么</a></li>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8threadlocal">为什么使用ThreadLocal</a></li>
+<li><a href="#threadlocal%E7%9A%84%E8%AE%BE%E8%AE%A1">ThreadLocal的设计</a>
+<ul>
+<li><a href="#threadlocal%E5%88%9D%E5%A7%8B%E5%8C%96">ThreadLocal初始化</a></li>
+<li><a href="#threadlocal%E8%B5%8B%E5%80%BC">ThreadLocal赋值</a></li>
+<li><a href="#threadlocal%E5%8F%96%E5%80%BC">ThreadLocal取值</a></li>
+<li><a href="#threadlocal%E5%9B%9E%E6%94%B6">ThreadLocal回收</a></li>
+<li><a href="#threadlocalmap">ThreadLocalMap</a></li>
+</ul>
+</li>
+<li><a href="#threadlocal%E7%9A%84%E4%BD%BF%E7%94%A8">ThreadLocal的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/java-ji-chu-pian-duo-xian-cheng-xian-cheng-chi/">
+              <h3 class="post-title">
+                Java基础篇 - 多线程 - 线程池
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
