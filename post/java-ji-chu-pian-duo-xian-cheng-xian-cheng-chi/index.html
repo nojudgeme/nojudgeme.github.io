@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area</title>
-<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623319009694">
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1623743382336">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
 <link rel="alternate" type="application/atom+xml" title="Java基础篇 - 多线程 - 线程池 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
@@ -24,7 +24,7 @@
       <div class="main-content">
         <div class="site-header">
   <a href="https://nojudgeme.github.io">
-  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623319009694" alt="">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1623743382336" alt="">
   </a>
   <h1 class="site-title">
     Huffman&#39;s Study Area
@@ -84,7 +84,7 @@
                 2021-06-08
               </span>
               <span>
-                13 min read
+                14 min read
               </span>
               
                 <a href="https://nojudgeme.github.io/tag/zlHt5cL4Y/" class="post-tag">
@@ -136,7 +136,7 @@
 <li>再次检查<code>ctl</code>,当工作线程数大于等于核心线程数,工作线程数小于最大线程,且任务阻塞队列中任务已满时(<code>corePoolSize&lt;=workerCount&lt;maximumPoolSize &amp;&amp; workerCountOf==0</code>),启动一个线程来执行该任务.</li>
 <li>当工作线程数大于等于最大线程数时且任务阻塞队列已满(<code>workerCount&gt;=maximumPoolSize &amp;&amp; workerCountOf==0</code>),采用拒绝策略处理任务.</li>
 </ol>
-<h6 id="任务缓冲">任务缓冲</h6>
+<p>######　任务缓冲</p>
 <p>线程池管理任务的核心模块是通过使用阻塞队列将任务和线程解耦(生产者消费者模式).阻塞队列中存放任务,放入任务的线程充当生产者,取出任务的线程充当消费者.</p>
 <figure data-type="image" tabindex="3"><img src="https://p1.meituan.net/travelcube/f4d89c87acf102b45be8ccf3ed83352a9497.png" alt="" loading="lazy"></figure>
 <p>JDK提供的默认阻塞队列实现:</p>
@@ -289,7 +289,7 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
 <p>核心线程会加入<code>corePoolSize</code>,是最小数量的保持活动状态的工作线程(<code>worker</code>)</p>
 <p>非核心线程则不会加入<code>corePoolSize</code>,当超过了<code>keepAliveTime</code>就释放</p>
 </blockquote>
-<h6 id="工作线程执行任务">工作线程执行任务</h6>
+<h6 id="工作线程执行任务流程">工作线程执行任务流程</h6>
 <p>worker中使用runWorker()方法来执行任务,具体流程如下:</p>
 <ol>
 <li>通过while循环获取任务(<code>firstTask或着getTask()</code>)</li>
@@ -414,6 +414,13 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
     }
 }
 </code></pre>
+<h4 id="总结">总结</h4>
+<p>线程池工作流程:<br>
+新建线程池-&gt;提交任务-&gt;执行任务-&gt;判断线程池核心线程数-&gt;判断任务队列是否已满-&gt;判断线程池最大线程数是否已满-&gt;触发拒绝策略</p>
+<figure data-type="image" tabindex="11"><img src="http://img.zhengjianru.work/ThreadPool%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B1.png" alt="ThreadPool工作流程1" loading="lazy"></figure>
+<p>工作线程工作流程:</p>
+<p>start()线程准备就绪-&gt;run()方法准备执行任务-&gt;runWorker(this)-&gt;循环获取任务-&gt;直至拿不到任务-&gt;工作线程退出-&gt;线程集合删除该工作线程-&gt;尝试关闭线程池</p>
+<figure data-type="image" tabindex="12"><img src="http://img.zhengjianru.work/woker%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.png" alt="woker工作流程" loading="lazy"></figure>
 <blockquote>
 <p>参考资料:https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html</p>
 </blockquote>
@@ -434,7 +441,6 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
 <li><a href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">工作流程</a>
 <ul>
 <li><a href="#%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B">任务执行流程</a></li>
-<li><a href="#%E4%BB%BB%E5%8A%A1%E7%BC%93%E5%86%B2">任务缓冲</a></li>
 <li><a href="#%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7">任务申请</a></li>
 <li><a href="#%E4%BB%BB%E5%8A%A1%E6%8B%92%E7%BB%9D">任务拒绝</a></li>
 </ul>
@@ -442,7 +448,7 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
 <li><a href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F">生命周期</a></li>
 <li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B">工作线程</a>
 <ul>
-<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1">工作线程执行任务</a></li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C%E4%BB%BB%E5%8A%A1%E6%B5%81%E7%A8%8B">工作线程执行任务流程</a></li>
 <li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E5%A2%9E%E5%8A%A0">工作线程增加</a></li>
 <li><a href="#%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6">工作线程回收</a></li>
 </ul>
@@ -450,6 +456,7 @@ private static int ctlOf(int rs, int wc) { return rs | wc;
 </ul>
 </li>
 <li><a href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BD%BF%E7%94%A8">线程池的使用</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
 </ul>
 </li>
 </ul>
