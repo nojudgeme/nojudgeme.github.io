@@ -1,0 +1,586 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>认证与授权 | Huffman&#39;s Study Area</title>
+<link rel="shortcut icon" href="https://nojudgeme.github.io/favicon.ico?v=1624421715154">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://nojudgeme.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="认证与授权 | Huffman&#39;s Study Area - Atom Feed" href="https://nojudgeme.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="通常我们在网上冲浪时,一般会遇到登录/注册的情况.这么做的目的是为了什么?为的是下次我们再来的时候,方便记住我们(通常称之为用户).
+
+当我们不想登录时,我们就是游客/匿名用户
+当我们登录时,我们就是有身份的用户
+
+为什么说是有身份的用户?..." />
+    <meta name="keywords" content="认证与授权,basic auth,oauth2,jwt,saml,hmac" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://nojudgeme.github.io">
+  <img class="avatar" src="https://nojudgeme.github.io/images/avatar.png?v=1624421715154" alt="">
+  </a>
+  <h1 class="site-title">
+    Huffman&#39;s Study Area
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              认证与授权
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-06-23
+              </span>
+              <span>
+                19 min read
+              </span>
+              
+                <a href="https://nojudgeme.github.io/tag/TcFZuVUJb/" class="post-tag">
+                  # 认证与授权
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/NOvkK-H6fh/" class="post-tag">
+                  # basic auth
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/79pVlchKbn/" class="post-tag">
+                  # oauth2
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/cd9JCgsx-Z/" class="post-tag">
+                  # jwt
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/LwsLljxSY2/" class="post-tag">
+                  # saml
+                </a>
+              
+                <a href="https://nojudgeme.github.io/tag/77kyqeitv3/" class="post-tag">
+                  # hmac
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>通常我们在网上冲浪时,一般会遇到登录/注册的情况.这么做的目的是为了什么?为的是下次我们再来的时候,方便记住我们(通常称之为用户).</p>
+<ul>
+<li>当我们不想登录时,我们就是游客/匿名用户</li>
+<li>当我们登录时,我们就是有身份的用户</li>
+</ul>
+<p>为什么说是有身份的用户?因为系统想区分开不同的用户可以访问不同的内容.拿逛某直播平台举例:</p>
+<ul>
+<li>游客身份就只能看高清的主播视频,还不让发弹幕</li>
+<li>普通用户身份就能看超清的主播视频,还可以发弹幕</li>
+<li>VIP用户还能享受到主播的热烈欢迎</li>
+<li>主播的话就可以开启专属于自己的直播间</li>
+</ul>
+<h4 id="认证与授权概念">认证与授权概念</h4>
+<h5 id="认证">认证</h5>
+<p>登录的过程就是<strong>认证(Authentication)</strong>.即弄清楚<code>我是谁? -&gt; 游客? 用户? 主播?</code></p>
+<p>认证通常需要用户提供一些信息如用户名和密码等,目的是为了下次再访问时,弄清楚<code>谁是谁?</code></p>
+<p>通常我们称这些信息叫<strong>因子(factors)</strong>.基于这些<strong>因子</strong>,我们可以将任何认证机制划分为三类:</p>
+<ul>
+<li>单因子认证 : 只依赖用户名+密码</li>
+<li>双因子认证 : 用户名+密码+手机短信等其他方式</li>
+<li>多因子认证(MFA) : 两个或两个以上的因子,如用户名+密码+手机短信+人脸识别+指纹等其他方式</li>
+</ul>
+<h5 id="授权">授权</h5>
+<p>登录成功后(完成认证),我们知道了<code>我是谁</code>,但不知道能做什么.而验证<code>我能做什么?</code>的过程就是<strong>授权(Authorization)</strong>,</p>
+<p>通常,<strong>授权</strong>发生在<strong>认证</strong>之后,而<strong>授权</strong>通过**策略(Policies)<strong>和</strong>规则(Rules)**来实现的.</p>
+<blockquote>
+<p>在现实场景中,通常认证和授权一起使用,保护资源被恶意访问.<br>
+未通过认证的,禁止访问资源.通过认证的,但没有权限的,依旧禁止访问资源.</p>
+</blockquote>
+<h5 id="凭证">凭证</h5>
+<p>认证的基础是通过类似于用户名+密码完成,而用户名+密码组成了认证媒介--<strong>凭证(Credentials)</strong>.就好比我们每个人都有属于自己的身份证/护照/社保卡,这些都代表了<code>我是谁</code>,所以这些也都算是<code>凭证</code>.<strong>凭证</strong>就是能代表<code>我是谁</code>的东西.</p>
+<h4 id="专有名词解释">专有名词解释</h4>
+<p><strong>Authorization Server/Identity Provider(IDP)</strong>: 负责认证服务,提供用户身份信息</p>
+<p><strong>Resource Server/Service Provider(SP)</strong>: 负责提供资源(页面、数据、API调用)</p>
+<p><strong>User Agent</strong>: 用户代理,一般就是指的浏览器</p>
+<h6 id="oauth2-术语">OAuth2 术语</h6>
+<p>OAuth2定义了四种角色(<strong>Roles</strong>):</p>
+<ol>
+<li><strong>Resource Owner</strong>：资源拥有者,即有能力访问受保护资源的实体,一般是终端用户.</li>
+<li><strong>Resource Server</strong>：资源服务器,即存储受保护资源的服务器,能接受和响应使用访问令牌的受保护资源请求.在逻辑上与认证服务器不同,但在物理上可以是同一台机器.</li>
+<li><strong>Authorization Server</strong>: 授权服务器,即服务提供方专门用来处理认证,授予令牌的服务器.</li>
+<li><strong>Client</strong>: 客户端又被称为第三方应用(<strong>Third-party Application</strong>).指对资源发起请求的应用程序.</li>
+</ol>
+<p>还定义了两种令牌(<strong>Tokens</strong>):</p>
+<ol>
+<li><strong>Access Token</strong>: 访问令牌,即授权服务器接受到用户请求后,颁发的一个有有效期的字符串,内包含认证信息.</li>
+<li><strong>Refresh Token</strong>: 更新令牌,用于获取一个新的访问令牌.访问令牌失效重新再获取的流程复杂,使用更新令牌简化获取访问令牌流程.</li>
+</ol>
+<p>四种授权许可(<strong>Authorization Grant</strong>):即客户端(第三方应用)通过终端用户授权,才能获得令牌</p>
+<ol>
+<li><strong>Authorization Code</strong>: 授权代码,作为资源客户端(终端用户)和客户端(第三方应用)的中间人.第三方应用将用户引导至授权服务器,然后用户通过授权服务器拿到授权代码返回第三方应用.<br>
+<code>正宗模式,功能最完整、流程最严密的授权模式,通常使用在公网的开放平台中,支持refresh_token</code>.</li>
+<li><strong>Implicit Grant</strong>: 隐式许可,不向客户端(第三方应用)发送授权代码,直接由客户端获取访问令牌.<br>
+<code>简化模式,为web浏览器应用设计,适用于纯静态页面应用,不支持refresh_token</code>.</li>
+<li><strong>Resource owner password credentials (ROPC)</strong>: 资源拥有者密码凭证,即用户可以通过用户名密码凭证获取访问令牌.<br>
+<code>密码模式,为遗留系统设计,一般在内部系统中使用,调用者是以用户为单位,不支持refresh_token</code>.</li>
+<li><strong>Client Credentials</strong>: 客户端凭证,客户端请求访问资源,直接根据client的id和密钥即可获取访问令牌.<br>
+<code>客户端模式,为后台api服务设计,一般在内部系统之间的API调用,调用者是以平台为单位,不支持refresh_token</code>.</li>
+</ol>
+<p>使用一个例子来说明这些名词对应关系:</p>
+<p>想象一个地铁运输系统.典型的引导流程如下:一位乘客从售票机或售票窗口购买车票,制票系统许可这张车票在有限的时间或站点数量之间是合法的.而后乘客在闸机验票,车票合法则准许进入,即可乘坐列车.</p>
+<figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/16e700ad753a9673" alt="img" loading="lazy"></figure>
+<p>以上场景可以和下面的 OAuth 2.0 中的角色对应起来:</p>
+<figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/16e700f03492e665" alt="img" loading="lazy"></figure>
+<h6 id="jwt-术语">JWT 术语</h6>
+<p>jwt中定义字符串由三部分组成:<strong>头部 header</strong>、<strong>负载 payload</strong>、<strong>签名 signature</strong></p>
+<p><strong>头部 Header</strong>: 一般由两部分构成</p>
+<ul>
+<li><strong>typ</strong>: 表示令牌类型<code>type</code>,值为<code>jwt</code></li>
+<li><strong>alg</strong>: 表示签名该令牌的算法<code>algorithm</code>,如<code>Hmac、AES、RSA</code></li>
+</ul>
+<pre><code class="language-json">{
+	&quot;typ&quot;: &quot;JWT&quot;, //令牌类型
+	&quot;alg&quot;: &quot;HMACSHA256&quot; //令牌签名算法
+}
+</code></pre>
+<p><strong>负载 payload</strong>: 这部分由**声明(claims)**构成.</p>
+<pre><code class="language-json">//声明内容:
+{ 
+  &quot;jti&quot;: &quot;6341F7A9-FE72-4763-9085-69EDB5C8FBBD&quot;, //JWT ID:唯一的身份识别符
+  &quot;iss&quot;: &quot;Online JWT Builder&quot;, //issuer:发行jwt的主体
+  &quot;aud&quot;: &quot;www.example.com&quot;, //audience:接收jwt的对象
+  &quot;sub&quot;: &quot;jrocket@example.com&quot;, //subject:发出jwt的用户
+  &quot;iat&quot;: 1416797419, //issued at:发出时间
+  &quot;exp&quot;: 1448333419, //expiration:过期时间
+  &quot;nbf&quot;: 1436258419, //not before:不早于处理jwt的时间
+  //下面是自定义信息  
+  &quot;GivenName&quot;: &quot;Johnny&quot;, 	
+  &quot;Surname&quot;: &quot;Rocket&quot;, 
+  &quot;Email&quot;: &quot;jrocket@example.com&quot;, 
+  &quot;Role&quot;: [ &quot;Manager&quot;, &quot;Project Administrator&quot; ] 
+}
+</code></pre>
+<p><strong>签名 signature</strong>:</p>
+<p>签名过程如下:</p>
+<pre><code class="language-java">HMACSHA256( Base64URLEncode(header) + &quot;.&quot; + Base64URLEncode(payload), secret)
+</code></pre>
+<p>首先对头部和负载信息进行一个base64编码后拼接,然后将拼接后的内容根据头部定义的算法进行再次计算,如果使用到了密钥,则加入密钥一半计算,最终得到jwt的值.形如:</p>
+<pre><code class="language-java">eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYXRpc2giLCJhdWQiOiJteWFwcCIsIkNVU1QiOiIxIiwiZXhwIjoxNTY2MjE0NTg1LCJpc3MiOiJhdXRoLWFwcCJ9.WknG6jiM_vAaflLnKyjlXh5BrM4MUJR9dFrVx-XE3zRVWiyXeIVzI-OomFh0vVHRwrK3-Tttg0HyKBTnCA3mSg
+</code></pre>
+<p>在请求过程中,则带上这段字符串</p>
+<pre><code class="language-http">http://localhost:8080/verify?jwt=eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYXRpc2giLCJhdWQiOiJteWFwcCIsIkNVU1QiOiIxIiwiZXhwIjoxNTY2MjE0NTg1LCJpc3MiOiJhdXRoLWFwcCJ9.WknG6jiM_vAaflLnKyjlXh5BrM4MUJR9dFrVx-XE3zRVWiyXeIVzI-OomFh0vVHRwrK3-Tttg0HyKBTnCA3mSg
+</code></pre>
+<h4 id="认证与授权实现">认证与授权实现</h4>
+<h5 id="实现机制">实现机制</h5>
+<p>要实现认证和授权有多种途径,但时下最流行的是 <em>“基于令牌（token-based）”</em> 的方法.</p>
+<h6 id="什么是基于令牌的方式">什么是基于令牌的方式</h6>
+<p><strong>基于令牌的认证与授权</strong>就是:用户输入用户名密码后,返回一个加密后的令牌(Token).往后的请求中都要求带有该令牌,否则重新通过认证.</p>
+<h6 id="什么是令牌">什么是令牌</h6>
+<p><strong>令牌</strong>就是一串随机字符串,里面包含了用户的认证信息.形如:<code>ZYyqCO87qNkwOwzq8bhK8w6SqF8MhN27</code>或更长的<code>qLMODzBsSggIyyWrRTNaZxqs23$DdczkyIt%dbaHCMGJcw@Ziac\BKwTaEEFyMrbq</code>.</p>
+<p>令牌本身是无意义的,但服务器可以解令牌然后验证,验证通过则可以认为该用户已认证通过.</p>
+<h6 id="为什么要用令牌">为什么要用令牌</h6>
+<p>相比与传统的cookies而言,使用令牌有如下好处:</p>
+<ul>
+<li>无状态(即请求无关联) : 因为令牌包含了用户认证信息,所以服务端不用存储用户的登录信息,更容易拓展.</li>
+<li>跨域 :  cookie不允许跨域访问,而token只用在请求头中配置认证信息即可.</li>
+<li>支持移动端 : cookie不支持移动端(需要特殊处理),而token同上.</li>
+</ul>
+<h6 id="令牌的实现流程">令牌的实现流程</h6>
+<p>具体的实现可能各有不同,但大致的流程如下:</p>
+<ol>
+<li>用户通过用户名密码请求访问</li>
+<li>应用验证凭证</li>
+<li>验证通过向客户端发送签名令牌,不通过返回401重新认证</li>
+<li>客户端存储令牌,并在后面每一次请求中带上令牌</li>
+<li>服务器验证令牌并响应</li>
+</ol>
+<h5 id="实现方式">实现方式</h5>
+<p>业界已经有很多成熟的认证与授权方案,下面我会介绍在API开发中常常使用的几种认证和授权技术：HTTP Basic AUthentication、HAMC、OAuth2以及基于令牌的JWT token.</p>
+<h6 id="http-basic-authentication认证">HTTP Basic Authentication认证</h6>
+<figure data-type="image" tabindex="3"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210621133134.png" alt="截图_选择区域_20210621133134" loading="lazy"></figure>
+<p>想必大伙对上面这种图并不模式,这就是一个最简单的认证方式--<strong>Http Basic Authentication</strong>.它不包含授权过程,仅需要提供用户名和密码就能完成登录认证.</p>
+<p>当我们想访问http://localhost:8080/basicAuth资源时,一共有两步操作:</p>
+<ol>
+<li>服务器返回401状态码,要求客户端完成基础认证</li>
+</ol>
+<figure data-type="image" tabindex="4"><img src="http://img.zhengjianru.work/image-20210621133849140.png" alt="image-20210621133849140" loading="lazy"></figure>
+<ol start="2">
+<li>
+<p>客户端输入账户密码,浏览器将账户密码进行Base64编码后,放入请求头中,发送请求到服务器.</p>
+<p>通过返回200;不通过返回401,继续重新认证.</p>
+</li>
+</ol>
+<figure data-type="image" tabindex="5"><img src="http://img.zhengjianru.work/image-20210621134129782.png" alt="image-20210621134129782" loading="lazy"></figure>
+<p>Base64过程如下:</p>
+<pre><code class="language-java">String base64Encode = Base64.getEncoder().
+    encodeToString(&quot;username:password&quot;.getBytes(StandardCharsets.UTF_8));
+response.addHeader(&quot;Authorization&quot;, &quot;Basic &quot;+base64Encode);
+</code></pre>
+<p>这种方式的好处在于:实现起来十分简单,应用场景广泛.</p>
+<p>缺点在于:base64是一种编码方式而不是加密方式,用户名密码在传输过程中被人获取后解码,很容易就能拿到该用户的登录信息,十分不安全.</p>
+<h6 id="hmacaksk认证">HMAC(AK/SK)认证</h6>
+<p>像我之前对接IMOC平台时,平台会在用户初始化给用户分配Access Key(AK)和Secret Key(SK),其中AK用于身份认证,SK用于数据签名.AK/SK相当于公私钥,用于对称加/解密,SK应该只有平台和用户各存一份.</p>
+<p>这种基于AK/SK的认证方式<strong>基于散列的消息认证码(Hash-base Message Authentication Code-HMAC)<strong>来实现</strong>HMAC</strong>算法是一种标准的基于密钥的哈希算法,可以配合MD5、SHA-1等哈希算法,常见如<code>HmacMD5、HmacSHA1、HmacSHA256</code>等算法实现.</p>
+<figure data-type="image" tabindex="6"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210621185421.png" alt="截图_选择区域_20210621185421" loading="lazy"></figure>
+<p>HMAC认证流程如下:</p>
+<ol>
+<li>客户端需要在认证服务器中预先设置 access key（AK 或叫 app ID） 和 secure key（SK）</li>
+<li>在调用 API 时,客户端需要对参数和 access key 进行自然排序后并使用 secure key 进行签名生成一个额外的参数 digest</li>
+<li>服务器根据预先设置的 secure key 进行同样的摘要计算,并要求结果完全一致</li>
+<li><strong>注意 secure key 不能在网络中传输,以及在不受信任的位置存放（浏览器等）</strong></li>
+</ol>
+<h6 id="oauth2授权">OAuth2授权</h6>
+<p>OAuth(Open Authorization,开放授权)是一个开放标准的授权协议,允许用户授权第三方应用访问他们存储在资源服务上受保护的信息,而不需要将用户名和密码提供给第三方应用,解耦了认证和授权.<br>
+OAuth作为一种国际标准,目前传播广泛并被持续采用.OAuth2.0是OAuth协议的延续版本,更加安全,更易于实现,但不向后兼容OAuth1.0,即完全废止了OAuth1.0</p>
+<figure data-type="image" tabindex="7"><img src="http://img.zhengjianru.work/%E6%88%AA%E5%9B%BE_%E9%80%89%E6%8B%A9%E5%8C%BA%E5%9F%9F_20210622154018.png" alt="截图_选择区域_20210622154018" loading="lazy"></figure>
+<p>OAuth2授权简化流程如图所示:</p>
+<ol>
+<li>终端用户发起浏览器请求,访问目标系统-客户端 ( Resource Owner -&gt; Client )</li>
+<li>客户端向授权服务器发起授权请求 ( Client -&gt; Authorization Server )</li>
+<li>授权服务器通过请求,给于临时访问令牌和刷新令牌给客户端<br>
+( Authorization Server ---(access_token/refresh_token)---&gt; Client)</li>
+<li>客户端拿到访问令牌和刷新令牌后,带着令牌向资源服务器发起请求<br>
+( Client ---(access_token/refresh_token)---&gt; Resource Server )</li>
+</ol>
+<p>常见互联网使用场景:</p>
+<p>开放系统间授权:社交联合登录,开放API平台等. 如GitLab使用Github授权登录</p>
+<p>现代微服务安全:单页浏览器App(HTML5/JS/无状态)、无线原生App.如登录验证,获取token</p>
+<p>企业内部应用认证授权(IAM/SSO),前后端分离单页面应用(spa).如微服务间API调用,需要认证授权</p>
+<h6 id="jwt认证">JWT认证</h6>
+<p><strong>Json Web Token(JWT)</strong>,是一个定义了以 JSON 对象紧凑而自包含的在各方之间安全传输信息的标准.其包含了声明方面的信息,特别的被用于如 HTTP 等空间受约束的环境.该信息可被验证,也是可信的,因为经过了数字化签名.</p>
+<blockquote>
+<p>JWT 可以用 <em>密钥（如 HMAC）</em> 或 <em>公钥私钥对（RSA 或 ECDSA）</em> 签名</p>
+</blockquote>
+<p>JWT 的两个特性是：</p>
+<ul>
+<li><strong>紧凑 Compact：</strong> 因为其相对较小的尺寸,JWT 可以借由 URL 发送, 作为一个 POST 参数,或在一个 HTTP header 内.</li>
+<li><strong>自包含 Self-contained：</strong> 一个 JWT 包含了所有关于一个实体的所需信息,以避免多次查询数据库.JWT 的接纳者同样无需调用服务器以验证令牌.</li>
+</ul>
+<p>这些令牌可以是被签名的、被加密的,或两者皆有.签名过的令牌被用来验证令牌完整性,而加密过的令牌用来隐藏声明.</p>
+<p><strong>注意</strong>：正如名称所暗示的,JWT 是 JSON 形式的,也就意味着其包含键值对.虽说在 JSON 合法和有关方一致性方面,对键和值有多长并无限制,但大多数标准都遵循了 <em>3个字母</em> 的键格式.</p>
+<blockquote>
+<p>格式如: <strong>JWT Token = part1.part2.part3</strong></p>
+<p>part1 = Base64URLEncode(header json)</p>
+<p>part2 = Base64URLEncode(payload json)</p>
+<p>part3 = signature = header.json.alg(part1+&quot;.&quot;+part2,密钥) //如果有密钥;</p>
+<p>header、payload、signature的定义和内容参考jwt术语,此处不再赘述</p>
+</blockquote>
+<p>需要注意的是：</p>
+<ol>
+<li><code>Base64URLEncode</code>只是编码算法,不应在<code>header</code>和<code>payload</code>中存放敏感信息.</li>
+<li>JWT被生成后难以被撤回,为了避免一直可以使用,应该设置过期策略和撤销策略避免无用JWT被一直使用.</li>
+<li>高频撤回token的场景应该考虑其他的认证授权的方案.</li>
+<li>为了避免JWT在过期时间内被盗用,应该使用HTTPS协议传输.</li>
+</ol>
+<p><strong>JWT使用方式</strong>:在请求头或请求体中放入生成的JWT字符串</p>
+<pre><code class="language-http">//http header
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYXRpc2giLCJhdWQiOiJteWFwcCIsIkNVU1QiOiIxIiwiZXhwIjoxNTY2MjE0NTg1LCJpc3MiOiJhdXRoLWFwcCJ9.WknG6jiM_vAaflLnKyjlXh5BrM4MUJR9dFrVx-XE3zRVWiyXeIVzI-OomFh0vVHRwrK3-Tttg0HyKBTnCA3mSg
+//或http body
+jwt:eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYXRpc2giLCJhdWQiOiJteWFwcCIsIkNVU1QiOiIxIiwiZXhwIjoxNTY2MjE0NTg1LCJpc3MiOiJhdXRoLWFwcCJ9.WknG6jiM_vAaflLnKyjlXh5BrM4MUJR9dFrVx-XE3zRVWiyXeIVzI-OomFh0vVHRwrK3-Tttg0HyKBTnCA3mSg
+</code></pre>
+<p><strong>JWT认证流程</strong>如图:</p>
+<figure data-type="image" tabindex="8"><img src="http://img.zhengjianru.work/34831-20160622152344250-1238130627.jpg" alt="img" loading="lazy"></figure>
+<ol>
+<li>客户端请问访问受保护资源.</li>
+<li>认证服务对请求进行拦截,从cookie或http head/body查找jwt token.</li>
+<li>没有找到就返回401,进行重新认证;找到了就使用密钥对token进行解密,解码.</li>
+<li>完成解密解码过程后,验证签名,对token中**声明(claims)**部分进行验证;如果签名不对,或过期,或接收主体不对等原因导致验证不通过,则又返回401,进行重新认证.</li>
+<li>全部通过后,认证通过.后续再根据授权服务判断该请求是否有权限访问资源.</li>
+</ol>
+<h5 id="saml">SAML</h5>
+<p>**SAML(Security Assertion Markup Language - 安全断言标记语言)**是基于<em>XML</em>的开源标准数据结构,作用于不同的安全域之间交换认证和数据授权.这与基于令牌实现的认证与授权方式区别大不一样.<br>
+最主要解决的需求是Web端应用的单点登录.</p>
+<h6 id="saml工作流程">SAML工作流程</h6>
+<figure data-type="image" tabindex="9"><img src="http://img.zhengjianru.work/p132458.png" alt="image.png" loading="lazy"></figure>
+<ol>
+<li>用户使用浏览器访问资源服务器(<strong>SP-Resource Server/Service Provider</strong>),即目标应用</li>
+<li>目标应用生成SAML身份验证请求,并重定向到认证服务器(<strong>IDP-Authorization Server/Identity Provider</strong>).</li>
+<li>浏览器重定向到认证服务器,发起SAML请求.</li>
+<li>认证服务器对SAML请求进行解析.</li>
+<li>解析完成后,让用户填写认证信息(用户名/密码)</li>
+<li>认证服务器校验认证信息,成功则会生成一个SAML_Token(本质上就是一个xml),返回给目标应用,并将浏览器重定向至目标应用.</li>
+<li>应用解析验证Token,解析出用户是谁和拥有哪些权限,然后根据用户和权限允许访问目标资源.</li>
+</ol>
+<pre><code class="language-xml">&lt;!--IDP生成的一个SAML_Token样例--&gt;
+&lt;saml:Assertion
+   xmlns:saml=&quot;urn:oasis:names:tc:SAML:2.0:assertion&quot;
+   xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot;
+   xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+   ID=&quot;b07b804c-7c29-ea16-7300-4f3d6f7928ac&quot;
+   Version=&quot;2.0&quot;
+   IssueInstant=&quot;2004-12-05T09:22:05Z&quot;&gt;
+   &lt;saml:Issuer&gt;https://idp.example.org/SAML2&lt;/saml:Issuer&gt;
+   &lt;ds:Signature
+     xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;...&lt;/ds:Signature&gt;
+   &lt;saml:Subject&gt;
+     &lt;saml:NameID
+       Format=&quot;urn:oasis:names:tc:SAML:2.0:nameid-format:transient&quot;&gt;
+       3f7b3dcf-1674-4ecd-92c8-1544f346baf8
+     &lt;/saml:NameID&gt;
+     &lt;saml:SubjectConfirmation
+       Method=&quot;urn:oasis:names:tc:SAML:2.0:cm:bearer&quot;&gt;
+       &lt;saml:SubjectConfirmationData
+         InResponseTo=&quot;aaf23196-1773-2113-474a-fe114412ab72&quot;
+         Recipient=&quot;https://sp.example.com/SAML2/SSO/POST&quot;
+         NotOnOrAfter=&quot;2004-12-05T09:27:05Z&quot;/&gt;
+     &lt;/saml:SubjectConfirmation&gt;
+   &lt;/saml:Subject&gt;
+   &lt;saml:Conditions
+     NotBefore=&quot;2004-12-05T09:17:05Z&quot;
+     NotOnOrAfter=&quot;2004-12-05T09:27:05Z&quot;&gt;
+     &lt;saml:AudienceRestriction&gt;
+       &lt;saml:Audience&gt;https://sp.example.com/SAML2&lt;/saml:Audience&gt;
+     &lt;/saml:AudienceRestriction&gt;
+   &lt;/saml:Conditions&gt;
+   &lt;!--身份断言--&gt;
+   &lt;saml:AuthnStatement
+     AuthnInstant=&quot;2004-12-05T09:22:00Z&quot;
+     SessionIndex=&quot;b07b804c-7c29-ea16-7300-4f3d6f7928ac&quot;&gt;
+     &lt;saml:AuthnContext&gt;
+       &lt;saml:AuthnContextClassRef&gt;
+         urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport
+       &lt;/saml:AuthnContextClassRef&gt;
+     &lt;/saml:AuthnContext&gt;
+   &lt;/saml:AuthnStatement&gt;
+   &lt;!--属性断言--&gt;
+   &lt;saml:AttributeStatement&gt;
+     &lt;saml:Attribute
+       xmlns:x500=&quot;urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500&quot;
+       x500:Encoding=&quot;LDAP&quot;
+       NameFormat=&quot;urn:oasis:names:tc:SAML:2.0:attrname-format:uri&quot;
+       Name=&quot;urn:oid:1.3.6.1.4.1.5923.1.1.1.1&quot;
+       FriendlyName=&quot;eduPersonAffiliation&quot;&gt;
+       &lt;saml:AttributeValue
+         xsi:type=&quot;xs:string&quot;&gt;member&lt;/saml:AttributeValue&gt;
+       &lt;saml:AttributeValue
+         xsi:type=&quot;xs:string&quot;&gt;staff&lt;/saml:AttributeValue&gt;
+     &lt;/saml:Attribute&gt;
+   &lt;/saml:AttributeStatement&gt;
+ &lt;/saml:Assertion&gt;
+</code></pre>
+<pre><code class="language-yaml">#sp中saml文件配置,例如gitlab
+omniauth:
+  providers:
+    - {
+      name: 'saml',
+      args: {
+        assertion_consumer_service_url: 'https://gitlab.example.com/users/auth/saml/callback',
+        idp_cert_fingerprint: '43:51:43:a1:b5:fc:8b:b7:0a:3a:a9:b1:0f:66:73:a8',
+        idp_sso_target_url: 'https://login.example.com/idp',
+        issuer: 'https://gitlab.example.com',
+        name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
+      },
+      label: 'Company Login'  # optional label for SAML login button, defaults to &quot;Saml&quot;
+    }
+</code></pre>
+<h4 id="参考资料">参考资料</h4>
+<p><a href="https://juejin.cn/post/6844904000811171847#heading-10">[译] 深入 OAuth2.0 和 JWT</a></p>
+<p><a href="https://insights.thoughtworks.cn/api-2/">细说API – 认证、授权和凭证</a></p>
+<p><a href="https://help.aliyun.com/document_detail/174227.html?spm=a2c4g.11186623.6.704.132c7e72LSrwVq#ZoRqH">OAuth2</a></p>
+<p><a href="https://www.cnblogs.com/xiekeli/p/5607107.html">几种常用的认证机制</a></p>
+<p><a href="https://zh.wikipedia.org/wiki/SAML_2.0">SAML 2.0</a></p>
+<p><a href="https://docs.gitlab.com/ee/integration/saml.html">SAML OmniAuth 提供程序</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%8E%88%E6%9D%83%E6%A6%82%E5%BF%B5">认证与授权概念</a>
+<ul>
+<li><a href="#%E8%AE%A4%E8%AF%81">认证</a></li>
+<li><a href="#%E6%8E%88%E6%9D%83">授权</a></li>
+<li><a href="#%E5%87%AD%E8%AF%81">凭证</a></li>
+</ul>
+</li>
+<li><a href="#%E4%B8%93%E6%9C%89%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A">专有名词解释</a><br>
+*
+<ul>
+<li><a href="#oauth2-%E6%9C%AF%E8%AF%AD">OAuth2 术语</a></li>
+<li><a href="#jwt-%E6%9C%AF%E8%AF%AD">JWT 术语</a></li>
+</ul>
+</li>
+<li><a href="#%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%8E%88%E6%9D%83%E5%AE%9E%E7%8E%B0">认证与授权实现</a>
+<ul>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6">实现机制</a>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%9F%BA%E4%BA%8E%E4%BB%A4%E7%89%8C%E7%9A%84%E6%96%B9%E5%BC%8F">什么是基于令牌的方式</a></li>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BB%A4%E7%89%8C">什么是令牌</a></li>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E4%BB%A4%E7%89%8C">为什么要用令牌</a></li>
+<li><a href="#%E4%BB%A4%E7%89%8C%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%B5%81%E7%A8%8B">令牌的实现流程</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F">实现方式</a>
+<ul>
+<li><a href="#http-basic-authentication%E8%AE%A4%E8%AF%81">HTTP Basic Authentication认证</a></li>
+<li><a href="#hmacaksk%E8%AE%A4%E8%AF%81">HMAC(AK/SK)认证</a></li>
+<li><a href="#oauth2%E6%8E%88%E6%9D%83">OAuth2授权</a></li>
+<li><a href="#jwt%E8%AE%A4%E8%AF%81">JWT认证</a></li>
+</ul>
+</li>
+<li><a href="#saml">SAML</a>
+<ul>
+<li><a href="#saml%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B">SAML工作流程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99">参考资料</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://nojudgeme.github.io/post/jia-mi-yu-an-quan/">
+              <h3 class="post-title">
+                加密与安全
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: 'd45d03a855ca32e5e925',
+    clientSecret: '6dd7708c948b2173b1ffba88b9f658a42b85df45',
+    repo: 'nojudgeme.github.io',
+    owner: 'nojudgeme',
+    admin: ['nojudgeme'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://nojudgeme.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
