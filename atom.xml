@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://nojudgeme.github.io</id>
     <title>Huffman&apos;s Study Area</title>
-    <updated>2021-06-24T07:30:28.102Z</updated>
+    <updated>2021-06-24T07:41:39.226Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://nojudgeme.github.io"/>
     <link rel="self" href="https://nojudgeme.github.io/atom.xml"/>
@@ -51,7 +51,7 @@
 <p><strong>Authorization Server/Identity Provider(IDP)</strong>: 负责认证服务,提供用户身份信息</p>
 <p><strong>Resource Server/Service Provider(SP)</strong>: 负责提供资源(页面、数据、API调用)</p>
 <p><strong>User Agent</strong>: 用户代理,一般就是指的浏览器</p>
-<h6 id="oauth2-术语">OAuth2 术语</h6>
+<h5 id="oauth2-术语">OAuth2 术语</h5>
 <p>OAuth2定义了四种角色(<strong>Roles</strong>):</p>
 <ol>
 <li><strong>Resource Owner</strong>：资源拥有者,即有能力访问受保护资源的实体,一般是终端用户.</li>
@@ -80,7 +80,7 @@
 <figure data-type="image" tabindex="1"><img src="http://img.zhengjianru.work/16e700ad753a9673" alt="img" loading="lazy"></figure>
 <p>以上场景可以和下面的 OAuth 2.0 中的角色对应起来:</p>
 <figure data-type="image" tabindex="2"><img src="http://img.zhengjianru.work/16e700f03492e665" alt="img" loading="lazy"></figure>
-<h6 id="jwt-术语">JWT 术语</h6>
+<h5 id="jwt-术语">JWT 术语</h5>
 <p>jwt中定义字符串由三部分组成:<strong>头部 header</strong>、<strong>负载 payload</strong>、<strong>签名 signature</strong></p>
 <p><strong>头部 Header</strong>: 一般由两部分构成</p>
 <ul>
@@ -237,7 +237,7 @@ jwt:eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzYXRpc2giLCJhdWQiOiJteWFwcCI
 <li>全部通过后,认证通过.后续再根据授权服务判断该请求是否有权限访问资源.</li>
 </ol>
 <h5 id="saml">SAML</h5>
-<p>**SAML(Security Assertion Markup Language - 安全断言标记语言)**是基于<em>XML</em>的开源标准数据结构,作用于不同的安全域之间交换认证和数据授权.这与基于令牌实现的认证与授权方式区别大不一样.<br>
+<p>**SAML(Security Assertion Markup Language - 安全断言标记语言)**是基于XML的开源标准数据结构,作用于不同的安全域之间交换认证和数据授权.这与基于令牌实现的认证与授权方式区别大不一样.<br>
 最主要解决的需求是Web端应用的单点登录.</p>
 <h6 id="saml工作流程">SAML工作流程</h6>
 <figure data-type="image" tabindex="9"><img src="http://img.zhengjianru.work/p132458.png" alt="image.png" loading="lazy"></figure>
